@@ -1,0 +1,19 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="rl-course-v1",
+    version="1.0.0",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    python_requires=">=3.11",
+    install_requires=[
+        "gymnasium>=0.29.1",
+        "numpy>=1.26.0",
+        "scipy>=1.12.0",
+        "matplotlib>=3.8.0",
+        "seaborn>=0.13.0",
+        "pandas>=2.2.0",
+        "tqdm>=4.66.0",
+        "cloudpickle>=3.0.0",
+    ],
+)
