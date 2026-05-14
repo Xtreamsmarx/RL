@@ -143,9 +143,14 @@ def n_step_sarsa(
 
             tau = t - n + 1
             if tau >= 0:
+                # Avoid overflow when T is infinity and bounds-check array access
+                if T == float("inf"):
+                    end_idx = min(tau + n, len(rewards) - 1)
+                else:
+                    end_idx = min(tau + n, int(T), len(rewards) - 1)
                 G = sum(
                     gamma ** (i - tau - 1) * rewards[i]
-                    for i in range(tau + 1, min(tau + n, int(T)) + 1)
+                    for i in range(tau + 1, end_idx + 1)
                 )
                 if tau + n < T:
                     G += gamma ** n * Q[states[tau + n], actions[tau + n]]

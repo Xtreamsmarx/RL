@@ -298,9 +298,14 @@ def n_step_td_control(
 
             tau = t - n + 1
             if tau >= 0:
+                # Avoid overflow when T is infinity and bounds-check array access
+                if T == float("inf"):
+                    end_idx = min(tau + n, len(rewards) - 1)
+                else:
+                    end_idx = min(tau + n, int(T), len(rewards) - 1)
                 G = sum(
                     gamma ** (i - tau - 1) * rewards[i]
-                    for i in range(tau + 1, min(tau + n, int(T)) + 1)
+                    for i in range(tau + 1, end_idx + 1)
                 )
                 if tau + n < T:
                     G += gamma ** n * V[states[tau + n]]
@@ -329,6 +334,7 @@ def td_lambda_control(
     alpha: float    = 0.1,
     gamma: float    = 0.99,
     epsilon: float  = 0.1,
+    trace_cutoff: Optional[int] = None,
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, ValueFunction]:
     """
@@ -367,6 +373,12 @@ def td_lambda_control(
             delta = r + gamma * (0.0 if done else V[int(s_next)]) - V[int(s)]
             e    *= gamma * lam
             e[int(s)] += 1.0
+            
+            # Optional trace cutoff for numerical stability
+            if trace_cutoff is not None:
+                threshold = (gamma * lam) ** max(int(trace_cutoff), 1)
+                e[e < threshold] = 0.0
+            
             V.values  += alpha * delta * e
             s          = s_next
 
