@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RL Course Hub | All Websites</title>
+  <title>RL Course Hub | Complete Capstone Showcase</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #07121a;
@@ -22,223 +22,541 @@
 
     * { box-sizing: border-box; }
 
+    html, body { margin: 0; padding: 0; }
+
     body {
-      margin: 0;
       min-height: 100vh;
       font-family: "Manrope", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 8% 15%, rgba(58, 211, 177, 0.20), transparent 38%),
-        radial-gradient(circle at 85% 20%, rgba(255, 177, 103, 0.18), transparent 42%),
-        radial-gradient(circle at 55% 80%, rgba(107, 210, 255, 0.14), transparent 36%),
+        radial-gradient(circle at 8% 15%, rgba(58, 211, 177, 0.25), transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(255, 177, 103, 0.22), transparent 50%),
+        radial-gradient(circle at 55% 85%, rgba(107, 210, 255, 0.18), transparent 40%),
         linear-gradient(140deg, var(--bg), #050a10 58%, var(--bg-soft));
       overflow-x: hidden;
+      position: relative;
     }
 
-    .shell {
-      width: min(1100px, 94vw);
-      margin: 0 auto;
-      padding: 28px 0 44px;
+    /* Animated background elements */
+    .floating-orbs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
     }
 
-    .topbar {
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.15;
+      mix-blend-mode: screen;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #3ad3b1, transparent);
+      top: -100px;
+      left: -150px;
+      animation: float1 15s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #ffb167, transparent);
+      bottom: -50px;
+      right: -100px;
+      animation: float2 18s ease-in-out infinite;
+    }
+
+    .orb-3 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #6bd2ff, transparent);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: float3 20s ease-in-out infinite;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(40px, -60px); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-50px, 50px); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    /* Hero section */
+    .hero-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .header-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px 18px;
-      background: rgba(6, 17, 26, 0.68);
-      backdrop-filter: blur(10px);
+      padding: 20px 40px;
+      z-index: 10;
     }
 
-    .tag {
+    .header-tag {
       font-family: "JetBrains Mono", monospace;
       font-size: 12px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent-a);
-      margin: 0;
+      background: rgba(58, 211, 177, 0.12);
+      border: 1px solid rgba(58, 211, 177, 0.25);
+      border-radius: 999px;
+      padding: 8px 16px;
+      backdrop-filter: blur(8px);
+      animation: slideDown 0.8s ease-out;
     }
 
-    .repo-link {
+    .header-repo {
       color: var(--text);
       text-decoration: none;
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 8px 14px;
-      transition: border-color 0.25s ease, transform 0.25s ease;
-      font-size: 14px;
+      padding: 10px 16px;
+      font-size: 13px;
       font-weight: 700;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      animation: slideDown 0.8s ease-out;
     }
 
-    .repo-link:hover {
+    .header-repo:hover {
       border-color: var(--accent-c);
+      background: rgba(107, 210, 255, 0.08);
       transform: translateY(-2px);
     }
 
-    .hero {
-      margin-top: 26px;
-      display: grid;
-      gap: 14px;
-      animation: rise 0.7s ease both;
+    /* Hero content */
+    .hero-content {
+      max-width: 900px;
+      animation: fadeInUp 1s ease-out 0.2s both;
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(30px, 6vw, 56px);
-      line-height: 1.06;
-      letter-spacing: -0.03em;
-      max-width: 16ch;
+    .hero-badge {
+      display: inline-block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-b);
+      background: rgba(255, 177, 103, 0.12);
+      border: 1px solid rgba(255, 177, 103, 0.3);
+      border-radius: 999px;
+      padding: 7px 14px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(6px);
+    }
+
+    .hero-title {
+      margin: 0 0 16px;
+      font-size: clamp(44px, 8vw, 84px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent-c) 0%, var(--accent-a) 50%, var(--accent-b) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       text-wrap: balance;
     }
 
-    .lead {
-      margin: 0;
+    .hero-subtitle {
+      margin: 0 0 32px;
+      font-size: clamp(16px, 3vw, 24px);
       color: var(--muted);
-      max-width: 70ch;
-      line-height: 1.65;
-      font-size: clamp(14px, 2.6vw, 18px);
+      line-height: 1.6;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 400;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-c));
+      color: var(--bg);
+      box-shadow: 0 8px 32px rgba(58, 211, 177, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 48px rgba(58, 211, 177, 0.35);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-c);
+      background: rgba(107, 210, 255, 0.08);
+      transform: translateY(-3px);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 24px;
+      max-width: 600px;
+      margin: 48px auto 0;
+    }
+
+    .stat {
+      text-align: center;
+      animation: fadeInUp 1s ease-out 0.6s both;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-c), var(--accent-a));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Main content section */
+    .main-content {
+      position: relative;
+      z-index: 1;
+      padding: 60px 20px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      margin: 0;
+      font-size: clamp(15px, 2.5vw, 18px);
+      color: var(--muted);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .grid {
-      margin-top: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
     }
 
     .card {
       position: relative;
       border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
+      border-radius: 20px;
+      padding: 24px;
       background: var(--card);
-      box-shadow: 0 14px 44px rgba(4, 11, 17, 0.35);
+      box-shadow: 0 8px 32px rgba(4, 11, 17, 0.4);
       backdrop-filter: blur(12px);
-      transform: translateY(8px);
+      transform: translateY(12px);
       opacity: 0;
-      animation: cardIn 0.55s ease forwards;
+      animation: cardIn 0.6s ease-out forwards;
+      transition: all 0.3s ease;
     }
 
-    .card:nth-child(2) { animation-delay: 0.08s; }
-    .card:nth-child(3) { animation-delay: 0.16s; }
-    .card:nth-child(4) { animation-delay: 0.24s; }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
 
     .card::before {
       content: "";
       position: absolute;
       inset: -1px;
       border-radius: inherit;
-      background: linear-gradient(130deg, rgba(58, 211, 177, 0.28), transparent 38%, rgba(255, 177, 103, 0.30));
+      background: linear-gradient(130deg, rgba(58, 211, 177, 0.2), transparent 40%, rgba(107, 210, 255, 0.15));
       z-index: -1;
       opacity: 0;
-      transition: opacity 0.28s ease;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(4px);
+      border-color: var(--accent-a);
     }
 
     .card:hover::before { opacity: 1; }
 
     .card h2 {
-      margin: 0 0 8px;
-      font-size: clamp(18px, 2.4vw, 24px);
+      margin: 0 0 12px;
+      font-size: 22px;
+      font-weight: 700;
       letter-spacing: -0.01em;
     }
 
     .card p {
-      margin: 0 0 14px;
+      margin: 0 0 18px;
       color: var(--muted);
-      line-height: 1.55;
-      font-size: 14px;
+      line-height: 1.6;
+      font-size: 15px;
     }
 
-    .go {
+    .card-btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       color: var(--text);
       text-decoration: none;
-      background: linear-gradient(120deg, rgba(58, 211, 177, 0.20), rgba(107, 210, 255, 0.20));
-      border: 1px solid rgba(107, 210, 255, 0.45);
+      background: linear-gradient(120deg, rgba(58, 211, 177, 0.15), rgba(107, 210, 255, 0.15));
+      border: 1px solid rgba(107, 210, 255, 0.4);
       border-radius: 999px;
-      padding: 9px 14px;
+      padding: 10px 18px;
+      font-size: 14px;
       font-weight: 700;
-      transition: transform 0.22s ease, filter 0.22s ease;
+      transition: all 0.25s ease;
     }
 
-    .go:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
+    .card-btn:hover {
+      transform: translateX(4px);
+      border-color: var(--accent-c);
+      background: linear-gradient(120deg, rgba(58, 211, 177, 0.25), rgba(107, 210, 255, 0.25));
     }
 
-    .foot {
-      margin-top: 26px;
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid var(--line);
+      margin-top: 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-text {
       font-family: "JetBrains Mono", monospace;
       font-size: 12px;
-      color: #84a1b3;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      opacity: 0.92;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      opacity: 0.85;
     }
 
-    @keyframes rise {
-      from { transform: translateY(10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     @keyframes cardIn {
-      to { transform: translateY(0); opacity: 1; }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-bar {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .hero-title {
+        font-size: 48px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <p class="tag">RL Course V1-V3 Website Hub</p>
-      <a class="repo-link" href="https://github.com/Xtreamsmarx/RL" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
-    </header>
-
-    <section class="hero">
-      <h1>One Main Page for Every RL Website</h1>
-      <p class="lead">
-        This is the main GitHub Pages entrypoint for the RL project. Use the cards below to open the complete visual showcase,
-        the algorithm overview site, and the 3D RL arena.
-      </p>
-    </section>
-
-    <section class="grid" aria-label="Website navigation cards">
-      <article class="card">
-        <h2>Main Visual Showcase</h2>
-        <p>Seven-tab interactive capstone site with environment, policies, values, training dynamics, and agent cinema.</p>
-        <a class="go" href="website/visual.html">Open Main Page</a>
-      </article>
-
-      <article class="card">
-        <h2>Algorithm Overview</h2>
-        <p>Project overview website describing the RL capstone flow, decisions, and model-level summaries.</p>
-        <a class="go" href="website/index.html">Open Overview Site</a>
-      </article>
-
-      <article class="card">
-        <h2>V(extra) 3D Arena</h2>
-        <p>Standalone Three.js arena featuring CliffWalking and Car Track with five RL models and hard mode.</p>
-        <a class="go" href="V(extra)/index.html">Open 3D Arena</a>
-      </article>
-
-      <article class="card">
-        <h2>Technical Notes</h2>
-        <p>Supplementary engineering notes, troubleshooting history, and implementation insights.</p>
-        <a class="go" href="docs/technical-challenges.md">Open Notes</a>
-      </article>
-
-      <article class="card">
-        <h2>Full Report (PDF)</h2>
-        <p>Complete IEEE-style research paper with all algorithms, pseudocode, learning curves, and comprehensive technical analysis.</p>
-        <a class="go" href="website/RL.pdf" target="_blank" rel="noopener noreferrer">Open PDF Report</a>
-      </article>
-    </section>
-
-    <footer class="foot">Published via GitHub Pages from main branch</footer>
+  <!-- Floating animated background -->
+  <div class="floating-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
   </div>
+
+  <!-- Hero Section -->
+  <section class="hero-container">
+    <div class="header-bar">
+      <span class="header-tag">Reinforcement Learning Capstone V1-V3</span>
+      <a class="header-repo" href="https://github.com/Xtreamsmarx/RL" target="_blank" rel="noopener noreferrer">
+        View on GitHub →
+      </a>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">🤖 Complete Interactive Showcase</div>
+
+      <h1 class="hero-title">Explore the RL Universe</h1>
+
+      <p class="hero-subtitle">
+        From fundamental algorithms to 3D interactive visualizations. See how five RL models learn to navigate dangerous environments with cutting-edge training techniques.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#sections" class="btn btn-primary">Explore All Sites →</a>
+        <a href="website/visual.html" class="btn btn-secondary">Open Main Showcase</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Algorithms</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">7</div>
+          <div class="stat-label">Visualizations</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">3D</div>
+          <div class="stat-label">Arena</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Knowledge</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <section id="sections">
+      <div class="section-header">
+        <h2 class="section-title">All Websites</h2>
+        <p class="section-subtitle">Click any card to dive into interactive explorations and analysis</p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <h2>🎨 Visual Showcase</h2>
+          <p>Explore the complete 7-tab interactive capstone with environment layout, policy visualizations, value function heatmaps, agent demonstrations, and training curves.</p>
+          <a class="card-btn" href="website/visual.html">Open Showcase</a>
+        </article>
+
+        <article class="card">
+          <h2>📚 Algorithm Overview</h2>
+          <p>Project overview site describing the reinforcement learning capstone flow, key design decisions, and model-level summaries for all five algorithms.</p>
+          <a class="card-btn" href="website/index.html">Open Overview</a>
+        </article>
+
+        <article class="card">
+          <h2>🎮 3D RL Arena</h2>
+          <p>Standalone Three.js arena featuring CliffWalking and Car Track environments with five models competing in real-time. Includes hard mode and ghost comparison.</p>
+          <a class="card-btn" href="V(extra)/index.html">Open Arena</a>
+        </article>
+
+        <article class="card">
+          <h2>📖 Technical Notes</h2>
+          <p>Engineering documentation, troubleshooting history, and detailed implementation insights from building the entire RL capstone system.</p>
+          <a class="card-btn" href="docs/technical-challenges.md">Read Notes</a>
+        </article>
+
+        <article class="card">
+          <h2>📄 Full Research Paper</h2>
+          <p>Complete IEEE-style research paper with algorithm pseudocode, learning curves, mathematical analysis, and comprehensive technical documentation (PDF).</p>
+          <a class="card-btn" href="website/RL.pdf" target="_blank" rel="noopener noreferrer">Download PDF</a>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">Published on GitHub Pages · RL Course V3 · Complete Capstone Project</p>
+  </footer>
 </body>
 </html>
