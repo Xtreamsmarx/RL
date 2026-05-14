@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RL Course Hub | All Websites</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07121a;
+      --bg-soft: #0b1d2b;
+      --text: #edf4f8;
+      --muted: #97afbf;
+      --card: rgba(12, 31, 46, 0.78);
+      --line: rgba(150, 196, 223, 0.22);
+      --accent-a: #3ad3b1;
+      --accent-b: #ffb167;
+      --accent-c: #6bd2ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 15%, rgba(58, 211, 177, 0.20), transparent 38%),
+        radial-gradient(circle at 85% 20%, rgba(255, 177, 103, 0.18), transparent 42%),
+        radial-gradient(circle at 55% 80%, rgba(107, 210, 255, 0.14), transparent 36%),
+        linear-gradient(140deg, var(--bg), #050a10 58%, var(--bg-soft));
+      overflow-x: hidden;
+    }
+
+    .shell {
+      width: min(1100px, 94vw);
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 18px;
+      background: rgba(6, 17, 26, 0.68);
+      backdrop-filter: blur(10px);
+    }
+
+    .tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-a);
+      margin: 0;
+    }
+
+    .repo-link {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .repo-link:hover {
+      border-color: var(--accent-c);
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      margin-top: 26px;
+      display: grid;
+      gap: 14px;
+      animation: rise 0.7s ease both;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 56px);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+      max-width: 16ch;
+      text-wrap: balance;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 70ch;
+      line-height: 1.65;
+      font-size: clamp(14px, 2.6vw, 18px);
+    }
+
+    .grid {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: var(--card);
+      box-shadow: 0 14px 44px rgba(4, 11, 17, 0.35);
+      backdrop-filter: blur(12px);
+      transform: translateY(8px);
+      opacity: 0;
+      animation: cardIn 0.55s ease forwards;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.08s; }
+    .card:nth-child(3) { animation-delay: 0.16s; }
+    .card:nth-child(4) { animation-delay: 0.24s; }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(130deg, rgba(58, 211, 177, 0.28), transparent 38%, rgba(255, 177, 103, 0.30));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: clamp(18px, 2.4vw, 24px);
+      letter-spacing: -0.01em;
+    }
+
+    .card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .go {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      text-decoration: none;
+      background: linear-gradient(120deg, rgba(58, 211, 177, 0.20), rgba(107, 210, 255, 0.20));
+      border: 1px solid rgba(107, 210, 255, 0.45);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-weight: 700;
+      transition: transform 0.22s ease, filter 0.22s ease;
+    }
+
+    .go:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .foot {
+      margin-top: 26px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      color: #84a1b3;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      opacity: 0.92;
+    }
+
+    @keyframes rise {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes cardIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <p class="tag">RL Course V1-V3 Website Hub</p>
+      <a class="repo-link" href="https://github.com/Xtreamsmarx/RL" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+    </header>
+
+    <section class="hero">
+      <h1>One Main Page for Every RL Website</h1>
+      <p class="lead">
+        This is the main GitHub Pages entrypoint for the RL project. Use the cards below to open the complete visual showcase,
+        the algorithm overview site, and the 3D RL arena.
+      </p>
+    </section>
+
+    <section class="grid" aria-label="Website navigation cards">
+      <article class="card">
+        <h2>Main Visual Showcase</h2>
+        <p>Seven-tab interactive capstone site with environment, policies, values, training dynamics, and agent cinema.</p>
+        <a class="go" href="website/visual.html">Open Main Page</a>
+      </article>
+
+      <article class="card">
+        <h2>Algorithm Overview</h2>
+        <p>Project overview website describing the RL capstone flow, decisions, and model-level summaries.</p>
+        <a class="go" href="website/index.html">Open Overview Site</a>
+      </article>
+
+      <article class="card">
+        <h2>V(extra) 3D Arena</h2>
+        <p>Standalone Three.js arena featuring CliffWalking and Car Track with five RL models and hard mode.</p>
+        <a class="go" href="V(extra)/index.html">Open 3D Arena</a>
+      </article>
+
+      <article class="card">
+        <h2>Technical Notes</h2>
+        <p>Supplementary engineering notes, troubleshooting history, and implementation insights.</p>
+        <a class="go" href="docs/technical-challenges.md">Open Notes</a>
+      </article>
+    </section>
+
+    <footer class="foot">Published via GitHub Pages from main branch</footer>
+  </div>
+</body>
+</html>
