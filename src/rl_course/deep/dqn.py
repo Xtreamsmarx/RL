@@ -13,6 +13,14 @@ from torch import optim
 
 from rl_course.networks.mlp import DiscreteQNetwork
 from rl_course.replay.buffer import ReplayBuffer
+from rl_course.utils.results import (
+    append_csv_row,
+    ensure_output_dirs,
+    save_line_plot,
+    save_series_csv,
+    utc_timestamp,
+    update_overview_visualizations,
+)
 
 
 @dataclass
@@ -41,6 +49,8 @@ class DQNConfig:
     replay_save_interval: int = 10_000
     replay_dir: str = "data/replay/raw/dqn/FrozenLake-v1/fresh"
     checkpoint_dir: str = "checkpoints/dqn/FrozenLake-v1/default"
+    result_dir: str = "result"
+    visualization_dir: str = "visualization"
 
 
 class DQNTrainer:
@@ -59,6 +69,7 @@ class DQNTrainer:
         return obs_arr.astype(np.float32).reshape(-1)
 
     def train(self, env):
+        run_ts = utc_timestamp()
         n_actions = env.action_space.n
         n_states = env.observation_space.n
         input_dim = n_states
@@ -171,6 +182,71 @@ class DQNTrainer:
 
         if len(replay) > 0:
             replay.save_npz(replay_dir / "latest.npz")
+
+        _, csv_dir, fig_dir, _ = ensure_output_dirs(
+            result_dir=self.cfg.result_dir,
+            visualization_dir=self.cfg.visualization_dir,
+        )
+        append_csv_row(
+            csv_dir / "dqn_runs.csv",
+            [
+                "timestamp",
+                "env",
+                "episodes",
+                "steps",
+                "mean_return",
+                "std_return",
+                "mean_loss",
+                "device",
+                "checkpoint_dir",
+                "replay_dir",
+            ],
+            {
+                "timestamp": run_ts,
+                "env": self.cfg.env_id,
+                "episodes": metrics["episodes"],
+                "steps": metrics["steps"],
+                "mean_return": f"{metrics['mean_return']:.6f}",
+                "std_return": f"{metrics['std_return']:.6f}",
+                "mean_loss": f"{metrics['mean_loss']:.6f}",
+                "device": metrics["device"],
+                "checkpoint_dir": str(ckpt_dir),
+                "replay_dir": str(replay_dir),
+            },
+        )
+
+        save_series_csv(
+            csv_dir / f"dqn_episode_returns_{run_ts}.csv",
+            ["episode", "return"],
+            [(idx + 1, float(val)) for idx, val in enumerate(episode_returns)],
+        )
+        save_series_csv(
+            csv_dir / f"dqn_losses_{run_ts}.csv",
+            ["update_step", "loss"],
+            [(idx + 1, float(val)) for idx, val in enumerate(losses)],
+        )
+
+        save_line_plot(
+            path=fig_dir / f"dqn_returns_{run_ts}.png",
+            xs=[float(i + 1) for i in range(len(episode_returns))],
+            ys=[float(v) for v in episode_returns],
+            title="DQN Episode Returns",
+            xlabel="Episode",
+            ylabel="Return",
+        )
+        save_line_plot(
+            path=fig_dir / f"dqn_loss_{run_ts}.png",
+            xs=[float(i + 1) for i in range(len(losses))],
+            ys=[float(v) for v in losses],
+            title="DQN Training Loss",
+            xlabel="Update step",
+            ylabel="MSE loss",
+        )
+
+        update_overview_visualizations(
+            result_dir=self.cfg.result_dir,
+            visualization_dir=self.cfg.visualization_dir,
+        )
 
         return online_net, metrics
 

@@ -43,6 +43,7 @@ venv/
 
 # VS Code
 .vscode/
+.qodo/
 
 # OS
 .DS_Store

@@ -1,0 +1,6 @@
+timestamp,env,episodes,steps,mean_return,std_return,mean_loss,device,checkpoint_dir,replay_dir
+20260514_010306,FrozenLake-v1,60,481,0.000000,0.000000,0.000000,cpu,checkpoints\dqn\FrozenLake-v1\default,data\replay\raw\dqn\FrozenLake-v1\fresh
+20260514_011647,FrozenLake-v1,30,206,0.000000,0.000000,0.000000,cpu,checkpoints\dqn\FrozenLake-v1\default,data\replay\raw\dqn\FrozenLake-v1\fresh
+20260514_012131,FrozenLake-v1,30,206,0.000000,0.000000,0.000000,cpu,checkpoints\dqn\FrozenLake-v1\default,data\replay\raw\dqn\FrozenLake-v1\fresh
+20260514_012315,FrozenLake-v1,30,206,0.000000,0.000000,0.000000,cpu,checkpoints\dqn\FrozenLake-v1\default,data\replay\raw\dqn\FrozenLake-v1\fresh
+20260514_020351,FrozenLake-v1,100,778,0.020000,0.140000,0.002215,cpu,checkpoints\test_dqn,data\replay\test

@@ -1,6 +1,21 @@
-﻿# RL Course - V2
+﻿# RL Course - V3
+
+**Version 3** solidifies the capstone around deliberate algorithm choices, strategic environmental fit, and transparent decision-making. This version emphasizes **what was implemented and why**, as well as **what was deliberately not implemented** and the justification for those choices.
 
 Version 2 extends the repository from tabular RL into a mixed classical + deep RL codebase, while keeping reproducible structure for replay data, checkpoints, and diagnostics.
+
+---
+
+## 📋 Strategic Overview (V3)
+
+**For a detailed rationale of all implementation decisions, see [DECISIONS.md](DECISIONS.md)**, which includes:
+- ✅ Why each of the 14 classical algorithms was chosen
+- ✅ Why DQN was selected for deep RL (and why not PPO, TRPO, A3C, etc.)
+- ✅ Why FrozenLake-v1 is the appropriate environment
+- ❌ Deliberate non-implementations (swarm coordination, continuous control, hierarchical RL, etc.) and their justifications
+- 📊 Alignment with course content and pedagogical goals
+
+---
 
 ## Setup
 
@@ -37,6 +52,14 @@ docs/
 scripts/
    rotate_replay.py            # replace old replay files with newer snapshots
    saliency_dqn.py             # generate state-saliency plots from DQN checkpoint
+   visualize_results.py        # regenerate overview plots from result CSV logs
+
+result/
+   csv/                        # run logs and per-run metrics in CSV form
+   figures/                    # run-level figures (training curves, saliency)
+
+visualization/
+   *.png                       # consolidated overview figures across runs
 
 src/rl_course/
    deep/
@@ -81,6 +104,8 @@ DQN features included:
 3. replay buffer with hard capacity assertions.
 4. replay snapshot persistence for reproducibility.
 5. JSON config and metric logging per run.
+6. automatic result exports to result/csv and result/figures.
+7. automatic overview updates under visualization/.
 
 ### Train DQN
 
@@ -100,6 +125,18 @@ To replace older replay with newer snapshots while respecting storage limits:
 python scripts/rotate_replay.py --source_dir data/replay/raw/dqn/FrozenLake-v1/fresh --max_files 25 --max_total_mb 2048
 ```
 
+## Result Folder and Visualization Folder
+
+Every train.py run appends to result/csv/classical_runs.csv and writes run-level classical figures into result/figures/.
+
+Every train_drl.py run appends to result/csv/dqn_runs.csv, writes per-run series CSV files (episode returns and losses), and saves deep training curves under result/figures/.
+
+Overview visualizations are refreshed automatically under visualization/ and can be rebuilt manually with:
+
+```bash
+python scripts/visualize_results.py --result_dir result --visualization_dir visualization
+```
+
 ## Saliency and Visualization Utilities
 
 1. Rasterization utility for tabular Q/policy visualization: src/rl_course/utils/rasterize_q_values.py
@@ -107,7 +144,7 @@ python scripts/rotate_replay.py --source_dir data/replay/raw/dqn/FrozenLake-v1/f
 3. Script to generate saliency figures from a checkpoint:
 
 ```bash
-python scripts/saliency_dqn.py --checkpoint checkpoints/dqn/FrozenLake-v1/default/online.pt --state 0 --out reports/figures/dqn_saliency_state0.png
+python scripts/saliency_dqn.py --checkpoint checkpoints/dqn/FrozenLake-v1/default/online.pt --state 0 --out result/figures/dqn_saliency_state0.png --visualization_out visualization/dqn_saliency_state0.png
 ```
 
 ## Justification for Deep RL Choice (DQN)
@@ -139,6 +176,16 @@ Classical evaluation:
 ```bash
 python train.py --eval_only --checkpoint models/best_full.pkl
 ```
+
+## Citations & Attribution
+
+This capstone was developed with strategic guidance and implementation support from:
+
+- **Claude Haiku 4.5** (Anthropic) — Multi-turn debugging, algorithmic design validation, repository structure organization, technical documentation
+- **Course Materials** — Sutton & Barto (Reinforcement Learning: An Introduction), lecture slides and problem sets from RL Course
+- **Open Source Dependencies** — Gymnasium (v0.29.1+), PyTorch (v2.12.0+), NumPy, Pandas, Matplotlib
+
+**Development Philosophy**: This capstone prioritizes clarity, reproducibility, and honest technical documentation over state-of-the-art performance. See [DECISIONS.md](DECISIONS.md) for full strategic justifications and [docs/technical-challenges.md](docs/technical-challenges.md) for implementation obstacles encountered and resolved.
 
 ## License
 

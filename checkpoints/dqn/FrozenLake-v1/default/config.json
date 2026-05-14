@@ -2,7 +2,7 @@
   "env_id": "FrozenLake-v1",
   "is_slippery": true,
   "seed": 42,
-  "n_episodes": 1500,
+  "n_episodes": 30,
   "max_steps": 200,
   "gamma": 0.99,
   "lr": 0.001,
@@ -21,5 +21,7 @@
   ],
   "replay_save_interval": 10000,
   "replay_dir": "data/replay/raw/dqn/FrozenLake-v1/fresh",
-  "checkpoint_dir": "checkpoints/dqn/FrozenLake-v1/default"
+  "checkpoint_dir": "checkpoints/dqn/FrozenLake-v1/default",
+  "result_dir": "result",
+  "visualization_dir": "visualization"
 }

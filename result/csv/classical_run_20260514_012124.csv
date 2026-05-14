@@ -1,0 +1,2 @@
+timestamp,algorithm,env,n_episodes,eval_episodes,eval_mean,gamma,alpha,epsilon,n_steps,lam,trace_cutoff,seed,checkpoint,mode
+20260514_012124,sarsa_lambda,FrozenLake-v1,50,10,0.000000,0.99,0.1,0.1,4,0.9,,42,models/best.pkl,train_eval

@@ -22,6 +22,13 @@ import argparse
 import gymnasium as gym
 
 from rl_course.agents.agent import TabularAgent, AgentConfig
+from rl_course.utils.results import (
+    append_csv_row,
+    ensure_output_dirs,
+    save_line_plot,
+    utc_timestamp,
+    update_overview_visualizations,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -87,6 +94,7 @@ def build_parser() -> argparse.ArgumentParser:
 # ---------------------------------------------------------------------------
 def main():
     args = build_parser().parse_args()
+    run_ts = utc_timestamp()
 
     env_kwargs = {}
     if args.env == "FrozenLake-v1":
@@ -115,11 +123,62 @@ def main():
         if args.save:
             agent.save(args.checkpoint)
 
+    eval_mean = None
     if agent.policy is not None:
-        agent.evaluate(env, n_episodes=args.eval_episodes)
+        eval_mean = agent.evaluate(env, n_episodes=args.eval_episodes)
     else:
         print("[train.py] This algorithm produced a value function only (no policy to evaluate).")
     env.close()
+
+    _, csv_dir, fig_dir, _ = ensure_output_dirs(result_dir="result", visualization_dir="visualization")
+    fieldnames = [
+        "timestamp",
+        "algorithm",
+        "env",
+        "n_episodes",
+        "eval_episodes",
+        "eval_mean",
+        "gamma",
+        "alpha",
+        "epsilon",
+        "n_steps",
+        "lam",
+        "trace_cutoff",
+        "seed",
+        "checkpoint",
+        "mode",
+    ]
+    row = {
+        "timestamp": run_ts,
+        "algorithm": args.algorithm,
+        "env": args.env,
+        "n_episodes": args.n_episodes,
+        "eval_episodes": args.eval_episodes,
+        "eval_mean": "" if eval_mean is None else f"{eval_mean:.6f}",
+        "gamma": args.gamma,
+        "alpha": args.alpha,
+        "epsilon": args.epsilon,
+        "n_steps": args.n_steps,
+        "lam": args.lam,
+        "trace_cutoff": args.trace_cutoff,
+        "seed": args.seed,
+        "checkpoint": args.checkpoint,
+        "mode": "eval_only" if args.eval_only else "train_eval",
+    }
+    append_csv_row(csv_dir / "classical_runs.csv", fieldnames, row)
+    append_csv_row(csv_dir / f"classical_run_{run_ts}.csv", fieldnames, row)
+
+    if eval_mean is not None:
+        save_line_plot(
+            path=fig_dir / f"classical_eval_{args.algorithm}_{run_ts}.png",
+            xs=[1.0],
+            ys=[float(eval_mean)],
+            title=f"Classical Eval Mean | {args.algorithm}",
+            xlabel="Run",
+            ylabel="Eval mean return",
+        )
+
+    update_overview_visualizations(result_dir="result", visualization_dir="visualization")
 
 
 if __name__ == "__main__":

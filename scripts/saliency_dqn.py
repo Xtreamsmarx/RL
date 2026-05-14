@@ -16,7 +16,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--n_states", type=int, default=16)
     p.add_argument("--n_actions", type=int, default=4)
     p.add_argument("--state", type=int, default=0)
-    p.add_argument("--out", default="reports/figures/dqn_saliency_state0.png")
+    p.add_argument("--out", default="result/figures/dqn_saliency_state0.png")
+    p.add_argument("--visualization_out", default="visualization/dqn_saliency_state0.png")
     return p.parse_args()
 
 
@@ -29,6 +30,11 @@ def main() -> None:
     save_saliency_plot(
         saliency,
         path=args.out,
+        title=f"DQN Saliency | state={args.state}",
+    )
+    save_saliency_plot(
+        saliency,
+        path=args.visualization_out,
         title=f"DQN Saliency | state={args.state}",
     )
     print(f"[saliency_dqn] saved {args.out}")

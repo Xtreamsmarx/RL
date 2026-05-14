@@ -1,0 +1,8 @@
+{
+  "mean_return": 0.02,
+  "std_return": 0.13999999999999999,
+  "mean_loss": 0.002214500819016913,
+  "episodes": 100,
+  "steps": 778,
+  "device": "cpu"
+}

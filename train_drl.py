@@ -20,6 +20,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--checkpoint_dir", default="checkpoints/dqn/FrozenLake-v1/default")
     p.add_argument("--replay_dir", default="data/replay/raw/dqn/FrozenLake-v1/fresh")
+    p.add_argument("--result_dir", default="result")
+    p.add_argument("--visualization_dir", default="visualization")
     return p
 
 
@@ -36,6 +38,8 @@ def main() -> None:
         seed=args.seed,
         checkpoint_dir=args.checkpoint_dir,
         replay_dir=args.replay_dir,
+        result_dir=args.result_dir,
+        visualization_dir=args.visualization_dir,
     )
     cfg = DeepAgentConfig(algorithm=args.algorithm, dqn=dqn_cfg)
     agent = DeepAgent(cfg)
