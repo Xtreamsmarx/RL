@@ -13,8 +13,9 @@ from rl_course.networks.mlp import DiscreteQNetwork
 
 def dqn_saliency_for_state(model: DiscreteQNetwork, state_index: int, n_states: int) -> np.ndarray:
     model.eval()
-    x = torch.zeros((1, n_states), dtype=torch.float32, requires_grad=True)
+    x = torch.zeros((1, n_states), dtype=torch.float32)
     x[0, state_index] = 1.0
+    x.requires_grad_()
 
     q = model(x)
     action = int(torch.argmax(q, dim=1).item())
