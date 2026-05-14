@@ -710,8 +710,10 @@ canvas {
 }
 
 #simTimelineChart {
+    display: block;
     width: 100%;
-    min-height: 220px;
+    height: 180px !important;
+    max-height: 180px;
 }
 
 .trajectory-visualization {

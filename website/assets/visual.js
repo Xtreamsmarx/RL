@@ -868,17 +868,22 @@ function setText(id, text) {
 }
 
 function refreshVisibleCharts(tabId = '') {
-    // Charts initialized in hidden tabs can render at zero width.
-    // Force resize/update after tab becomes visible.
-    const charts = [convergenceChart, returnsChart, lossChart, epsilonChart, SIM_STATE.chart];
-    charts.forEach((chart) => {
-        if (chart) {
-            chart.resize();
-            chart.update('none');
-        }
-    });
+    const activeTabId = tabId || (document.querySelector('.tab-content.active')?.id ?? '');
 
-    if (tabId === 'agent-sim') {
+    // Charts initialized in hidden tabs can render at zero width.
+    // Resize only currently relevant charts to keep layout stable.
+    if (activeTabId === 'training') {
+        [convergenceChart, returnsChart, lossChart, epsilonChart].forEach((chart) => {
+            if (chart) {
+                chart.resize();
+                chart.update('none');
+            }
+        });
+    }
+
+    if (activeTabId === 'agent-sim' && SIM_STATE.chart) {
+        SIM_STATE.chart.resize();
+        SIM_STATE.chart.update('none');
         updateTimelineChart();
     }
 }
