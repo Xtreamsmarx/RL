@@ -162,10 +162,12 @@ function drawHeatmap(canvasId, values) {
 function generatePolicy(algorithmType) {
     // Simulate learned policies
     const policies = {
-        'ql': [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 3, 0],
-        'sarsa': [0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 3, 0],
-        'td': [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 3, 0],
-        'pi': [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 3, 0]
+        // Action mapping: 0=up, 1=down, 2=left, 3=right
+        // Policies below intentionally encode safe routes to goal state 15.
+        'ql':    [1, 3, 1, 2, 1, 0, 1, 0, 3, 3, 1, 0, 0, 3, 3, 0],
+        'sarsa': [1, 2, 1, 2, 1, 0, 1, 0, 3, 3, 1, 0, 0, 3, 3, 0],
+        'td':    [1, 3, 1, 2, 1, 0, 1, 0, 3, 3, 1, 0, 0, 3, 3, 0],
+        'pi':    [1, 3, 1, 2, 1, 0, 1, 0, 3, 3, 1, 0, 0, 3, 3, 0]
     };
     return policies[algorithmType] || policies.ql;
 }
@@ -865,6 +867,22 @@ function setText(id, text) {
     }
 }
 
+function refreshVisibleCharts(tabId = '') {
+    // Charts initialized in hidden tabs can render at zero width.
+    // Force resize/update after tab becomes visible.
+    const charts = [convergenceChart, returnsChart, lossChart, epsilonChart, SIM_STATE.chart];
+    charts.forEach((chart) => {
+        if (chart) {
+            chart.resize();
+            chart.update('none');
+        }
+    });
+
+    if (tabId === 'agent-sim') {
+        updateTimelineChart();
+    }
+}
+
 // ========================================
 // NAVIGATION
 // ========================================
@@ -884,6 +902,9 @@ function switchTab(tabId, linkElement = null) {
     if (linkElement && linkElement.parentElement) {
         linkElement.parentElement.classList.add('active');
     }
+
+    // Delay ensures layout is committed before Chart.js resize.
+    setTimeout(() => refreshVisibleCharts(tabId), 50);
 
     return false;
 }
@@ -916,6 +937,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize first simulation with full-episode timeline.
     runSimulation('ql');
     togglePlayback();
+
+    window.addEventListener('resize', () => {
+        refreshVisibleCharts();
+    });
 });
 
 // Export for module use
