@@ -133,11 +133,11 @@ body {
    ======================================== */
 
 .sidebar-nav {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    top: 148px;
     left: 0;
     width: 220px;
-    height: 100vh;
+    height: calc(100vh - 148px);
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(8px);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);

@@ -188,25 +188,32 @@ function generateValues(algorithmType) {
 // ========================================
 
 function initializeVisualizations() {
-    // Environment grid
-    drawGrid('gridCanvas');
-
-    // Policies
-    drawGrid('policyQL', generatePolicy('ql'));
-    drawGrid('policySARSA', generatePolicy('sarsa'));
-    drawGrid('policyTD', generatePolicy('td'));
-    drawGrid('policyPI', generatePolicy('pi'));
-
-    // Heatmaps
-    drawHeatmap('heatmapQL', generateValues('ql'));
-    drawHeatmap('heatmapSARSA', generateValues('sarsa'));
-    drawHeatmap('heatmapTD', generateValues('td'));
-    drawHeatmap('heatmapVI', generateValues('vi'));
+    renderEnvironmentCanvas();
+    renderPolicyCanvases();
+    renderValueCanvases();
 
     // Charts
     initializeCharts();
 
     // Comparison table is already in HTML
+}
+
+function renderEnvironmentCanvas() {
+    drawGrid('gridCanvas');
+}
+
+function renderPolicyCanvases() {
+    drawGrid('policyQL', generatePolicy('ql'));
+    drawGrid('policySARSA', generatePolicy('sarsa'));
+    drawGrid('policyTD', generatePolicy('td'));
+    drawGrid('policyPI', generatePolicy('pi'));
+}
+
+function renderValueCanvases() {
+    drawHeatmap('heatmapQL', generateValues('ql'));
+    drawHeatmap('heatmapSARSA', generateValues('sarsa'));
+    drawHeatmap('heatmapTD', generateValues('td'));
+    drawHeatmap('heatmapVI', generateValues('vi'));
 }
 
 // ========================================
@@ -906,6 +913,15 @@ function switchTab(tabId, linkElement = null) {
     document.querySelectorAll('.sidebar-nav li').forEach(li => li.classList.remove('active'));
     if (linkElement && linkElement.parentElement) {
         linkElement.parentElement.classList.add('active');
+    }
+
+    // Re-render canvases when a tab becomes visible to avoid hidden-tab blank canvas bugs.
+    if (tabId === 'environment') {
+        setTimeout(() => renderEnvironmentCanvas(), 25);
+    } else if (tabId === 'policies') {
+        setTimeout(() => renderPolicyCanvases(), 25);
+    } else if (tabId === 'values') {
+        setTimeout(() => renderValueCanvases(), 25);
     }
 
     // Delay ensures layout is committed before Chart.js resize.
