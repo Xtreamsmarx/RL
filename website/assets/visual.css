@@ -5,8 +5,10 @@
 :root {
     --primary: #05204a;
     --secondary: #0c3f8f;
+    --tertiary: #6a11cb;
     --accent: #02d6c1;
     --accent-warm: #ff8a3d;
+    --accent-soft: #8ff4e8;
     --success: #10b981;
     --danger: #ef4444;
     --bg-light: #f2f6fb;
@@ -15,6 +17,7 @@
     --text-dark: #1e293b;
     --text-light: #64748b;
     --border: #e2e8f0;
+    --card-border: rgba(8, 54, 116, 0.14);
     --shadow-md: 0 12px 24px -14px rgba(5, 32, 74, 0.35);
     --shadow-lg: 0 28px 48px -24px rgba(5, 32, 74, 0.5);
 }
@@ -37,6 +40,7 @@ html, body {
 body {
     position: relative;
     overflow-x: hidden;
+    letter-spacing: 0.01em;
 }
 
 .ambient-bg {
@@ -93,6 +97,10 @@ body {
     z-index: 1;
 }
 
+h1, h2, h3, h4 {
+    letter-spacing: -0.01em;
+}
+
 /* ========================================
    HEADER
    ======================================== */
@@ -118,14 +126,26 @@ body {
     filter: blur(1px);
 }
 
+.header::after {
+    content: '';
+    position: absolute;
+    inset: auto -8% -45px;
+    height: 90px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
+    transform: skewY(-2deg);
+}
+
 .header h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 3rem);
     margin-bottom: 0.5rem;
+    text-shadow: 0 8px 26px rgba(0, 0, 0, 0.28);
 }
 
 .header p {
     font-size: 1.1rem;
     opacity: 0.9;
+    max-width: 980px;
+    margin: 0 auto;
 }
 
 /* ========================================
@@ -143,6 +163,7 @@ body {
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
     z-index: 100;
+    border-right: 1px solid rgba(12, 63, 143, 0.15);
 }
 
 .sidebar-nav ul {
@@ -153,6 +174,8 @@ body {
 .sidebar-nav li {
     border-left: 4px solid transparent;
     transition: all 0.3s ease;
+    margin: 0.15rem 0.35rem;
+    border-radius: 12px;
 }
 
 .sidebar-nav a {
@@ -160,18 +183,21 @@ body {
     padding: 0.8rem 1.5rem;
     color: var(--text-dark);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 700;
+    border-radius: 10px;
     transition: all 0.3s ease;
 }
 
 .sidebar-nav a:hover {
-    background: var(--bg-light);
+    background: linear-gradient(90deg, rgba(2, 214, 193, 0.15), rgba(2, 214, 193, 0.04));
     color: var(--accent);
+    transform: translateX(3px);
 }
 
 .sidebar-nav li.active {
     border-left-color: var(--accent);
-    background: rgba(0, 212, 255, 0.1);
+    background: linear-gradient(90deg, rgba(2, 214, 193, 0.2), rgba(2, 214, 193, 0.04));
+    box-shadow: inset 0 0 0 1px rgba(2, 214, 193, 0.16);
 }
 
 .sidebar-nav li.active a {
@@ -190,7 +216,7 @@ body {
 
 .tab-content {
     display: none;
-    animation: fadeIn 0.5s ease-in;
+    animation: fadeIn 0.45s ease-in;
 }
 
 .tab-content.active {
@@ -212,8 +238,21 @@ body {
     color: var(--primary);
     font-size: 2rem;
     margin-bottom: 0.5rem;
-    border-bottom: 3px solid var(--accent);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--accent), var(--accent-warm)) 1;
     padding-bottom: 1rem;
+    position: relative;
+}
+
+.tab-content h2::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 22%;
+    max-width: 190px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-warm), transparent);
 }
 
 .section-desc {
@@ -238,7 +277,31 @@ body {
     padding: 2rem;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
-    border: 1px solid rgba(12, 63, 143, 0.08);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+}
+
+.viz-panel::before,
+.info-panel::before,
+.policy-card::before,
+.heatmap-card::before,
+.training-chart::before,
+.training-chart-large::before,
+.comparison-table-wrapper::before,
+.timeline-card::before,
+.trajectory-visualization::before,
+.network-container::before,
+.simulation-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--tertiary));
+    opacity: 0.7;
 }
 
 .grid-viz {
@@ -248,6 +311,7 @@ body {
     display: flex;
     justify-content: center;
     margin: 1rem 0;
+    border: 1px dashed rgba(12, 63, 143, 0.2);
 }
 
 .grid-legend {
@@ -281,6 +345,13 @@ body {
     padding: 1rem;
     border-radius: 8px;
     text-align: center;
+    border: 1px solid rgba(12, 63, 143, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.detail-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -18px rgba(12, 63, 143, 0.6);
 }
 
 .detail-label {
@@ -328,6 +399,11 @@ body {
     padding: 1.5rem;
     border-radius: 8px;
     border-left: 4px solid var(--accent-warm);
+    transition: transform 0.22s ease;
+}
+
+.dynamic-card:hover {
+    transform: translateY(-2px);
 }
 
 .dynamic-card h4 {
@@ -357,6 +433,14 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.26s ease, box-shadow 0.26s ease;
+}
+
+.policy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 28px 44px -36px rgba(5, 32, 74, 0.8);
 }
 
 .policy-canvas {
@@ -365,6 +449,7 @@ body {
     border-radius: 8px;
     background: var(--bg-light);
     margin: 1rem 0;
+    border: 1px solid rgba(12, 63, 143, 0.15);
 }
 
 .policy-desc {
@@ -404,6 +489,8 @@ body {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .heatmap-canvas {
@@ -432,12 +519,15 @@ body {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
     gap: 2rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .network-viz {
     background: var(--bg-light);
     padding: 1rem;
     border-radius: 8px;
+    border: 1px dashed rgba(12, 63, 143, 0.18);
 }
 
 .network-svg {
@@ -478,6 +568,7 @@ body {
     padding: 1rem;
     border-radius: 8px;
     border-left: 4px solid var(--accent);
+    border: 1px solid rgba(12, 63, 143, 0.1);
 }
 
 .arch-detail h4 {
@@ -513,6 +604,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
 }
 
 .training-chart {
@@ -551,6 +643,7 @@ canvas {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     overflow-x: auto;
+    position: relative;
 }
 
 .comparison-table {
@@ -573,7 +666,7 @@ canvas {
 }
 
 .comparison-table tbody tr:hover {
-    background: var(--bg-light);
+    background: linear-gradient(90deg, rgba(2, 214, 193, 0.08), rgba(2, 214, 193, 0.02));
 }
 
 .comparison-table strong {
@@ -593,6 +686,7 @@ canvas {
     grid-template-columns: auto 1fr auto;
     gap: 2rem;
     margin-bottom: 2rem;
+    position: relative;
 }
 
 .sim-controls, .sim-stats {
@@ -609,12 +703,14 @@ canvas {
     border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease, border-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .sim-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px -14px rgba(2, 214, 193, 0.8);
 }
 
 .sim-btn.active {
@@ -675,6 +771,7 @@ canvas {
 .sim-display.layered {
     background: linear-gradient(180deg, #f6fbff 0%, #edf5ff 100%);
     border: 1px solid rgba(12, 63, 143, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 
 .sim-display {
@@ -697,6 +794,7 @@ canvas {
     padding: 0.8rem;
     border-radius: 6px;
     text-align: center;
+    border: 1px solid rgba(12, 63, 143, 0.08);
 }
 
 .stat-label {
@@ -722,6 +820,7 @@ canvas {
     padding: 1.5rem;
     box-shadow: var(--shadow-md);
     margin-bottom: 2rem;
+    position: relative;
 }
 
 .timeline-desc {
@@ -742,6 +841,7 @@ canvas {
     border-radius: 12px;
     box-shadow: var(--shadow-md);
     text-align: center;
+    position: relative;
 }
 
 .trajectory-grid {
@@ -757,6 +857,7 @@ canvas {
     border-radius: 10px;
     padding: 1rem;
     text-align: left;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
 }
 
 .decision-panel h4 {
@@ -798,6 +899,17 @@ canvas {
     text-align: center;
     padding: 2rem;
     margin-top: 4rem;
+    position: relative;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-warm), transparent);
 }
 
 /* ========================================
@@ -845,7 +957,7 @@ canvas {
         border-bottom: 3px solid transparent;
         white-space: nowrap;
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.82);
+        background: rgba(255, 255, 255, 0.9);
     }
 
     .sidebar-nav li.active {
@@ -859,6 +971,10 @@ canvas {
 
     .header h1 {
         font-size: 1.8rem;
+    }
+
+    .tab-content h2::after {
+        width: 42%;
     }
 
     .policy-grid, .heatmap-grid {
