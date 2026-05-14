@@ -1,4 +1,4 @@
-# RL Course - V2
+﻿# RL Course - V2
 
 Version 2 extends the repository from tabular RL into a mixed classical + deep RL codebase, while keeping reproducible structure for replay data, checkpoints, and diagnostics.
 
@@ -12,7 +12,7 @@ or
 
 ```bash
 conda env create -f environment.yml
-conda activate rl_course_v1
+conda activate rl_course
 pip install -e .
 ```
 
@@ -38,7 +38,7 @@ scripts/
    rotate_replay.py            # replace old replay files with newer snapshots
    saliency_dqn.py             # generate state-saliency plots from DQN checkpoint
 
-src/rl_course_v1/
+src/rl_course/
    deep/
       dqn.py                    # DQN implementation
    networks/
@@ -102,8 +102,8 @@ python scripts/rotate_replay.py --source_dir data/replay/raw/dqn/FrozenLake-v1/f
 
 ## Saliency and Visualization Utilities
 
-1. Rasterization utility for tabular Q/policy visualization: src/rl_course_v1/utils/rasterize_q_values.py
-2. DQN saliency utility: src/rl_course_v1/utils/saliency.py
+1. Rasterization utility for tabular Q/policy visualization: src/rl_course/utils/rasterize_q_values.py
+2. DQN saliency utility: src/rl_course/utils/saliency.py
 3. Script to generate saliency figures from a checkpoint:
 
 ```bash
@@ -143,3 +143,4 @@ python train.py --eval_only --checkpoint models/best_full.pkl
 ## License
 
 MIT
+

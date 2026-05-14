@@ -1,11 +1,11 @@
-"""CLI entry point for deep RL training (v2)."""
+﻿"""CLI entry point for deep RL training (v2)."""
 
 from __future__ import annotations
 
 import argparse
 
-from rl_course_v1.agents.deep_agent import DeepAgent, DeepAgentConfig
-from rl_course_v1.deep import DQNConfig
+from rl_course.agents.deep_agent import DeepAgent, DeepAgentConfig
+from rl_course.deep import DQNConfig
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -45,3 +45,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

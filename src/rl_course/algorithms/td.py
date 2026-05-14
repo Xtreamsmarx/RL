@@ -1,19 +1,19 @@
-"""
+﻿"""
 Temporal Difference learning algorithms.
 
 Implements:
-  - td0_prediction           : TD(0) policy evaluation → V^π
-  - n_step_td_prediction     : forward-view TD(n) → V^π
-    - td_lambda_prediction_forward : forward-view TD(λ) → V^π
-  - td_lambda_prediction     : backward-view TD(λ) via eligibility traces → V^π
-  - n_step_td_control        : forward-view TD(n) + greedy improvement → π*
-  - td_lambda_control        : backward-view TD(λ) + greedy improvement → π*
+  - td0_prediction           : TD(0) policy evaluation â†’ V^Ï€
+  - n_step_td_prediction     : forward-view TD(n) â†’ V^Ï€
+    - td_lambda_prediction_forward : forward-view TD(Î») â†’ V^Ï€
+  - td_lambda_prediction     : backward-view TD(Î») via eligibility traces â†’ V^Ï€
+  - n_step_td_control        : forward-view TD(n) + greedy improvement â†’ Ï€*
+  - td_lambda_control        : backward-view TD(Î») + greedy improvement â†’ Ï€*
 
 All methods are on-policy and operate on V(s) (state values).
 For Q-value variants see sarsa.py.
 
 Reference:
-  Sutton & Barto Ch. 6–7, 12 (2018).
+  Sutton & Barto Ch. 6â€“7, 12 (2018).
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from __future__ import annotations
 import numpy as np
 from typing import Optional
 
-from rl_course_v1.mdp.policy import Policy, ValueFunction
+from rl_course.mdp.policy import Policy, ValueFunction
 
 
 def _lambda_return_from_t(
@@ -54,7 +54,7 @@ def _lambda_return_from_t(
 
 
 # ---------------------------------------------------------------------------
-# TD(0) — one-step prediction
+# TD(0) â€” one-step prediction
 # ---------------------------------------------------------------------------
 def td0_prediction(
     env,
@@ -66,7 +66,7 @@ def td0_prediction(
 ) -> ValueFunction:
     """
     TD(0) policy evaluation.
-    V(S_t) ← V(S_t) + α [R_{t+1} + γ V(S_{t+1}) - V(S_t)]
+    V(S_t) â† V(S_t) + Î± [R_{t+1} + Î³ V(S_{t+1}) - V(S_t)]
     """
     rng  = rng or np.random.default_rng()
     n_s  = env.observation_space.n
@@ -101,8 +101,8 @@ def n_step_td_prediction(
     """
     n-step TD policy evaluation (forward view / bootstrapped returns).
 
-    G_{t:t+n} = R_{t+1} + γ R_{t+2} + … + γ^{n-1} R_{t+n} + γ^n V(S_{t+n})
-    V(S_t) ← V(S_t) + α [G_{t:t+n} - V(S_t)]
+    G_{t:t+n} = R_{t+1} + Î³ R_{t+2} + â€¦ + Î³^{n-1} R_{t+n} + Î³^n V(S_{t+n})
+    V(S_t) â† V(S_t) + Î± [G_{t:t+n} - V(S_t)]
     """
     rng = rng or np.random.default_rng()
     n_s = env.observation_space.n
@@ -145,7 +145,7 @@ def n_step_td_prediction(
 
 
 # ---------------------------------------------------------------------------
-# TD(λ) prediction — backward view (eligibility traces)
+# TD(Î») prediction â€” backward view (eligibility traces)
 # ---------------------------------------------------------------------------
 def td_lambda_prediction(
     env,
@@ -158,11 +158,11 @@ def td_lambda_prediction(
     rng: Optional[np.random.Generator] = None,
 ) -> ValueFunction:
     """
-    Backward-view TD(λ) with accumulating eligibility traces.
+    Backward-view TD(Î») with accumulating eligibility traces.
 
-    δ_t = R_{t+1} + γ V(S_{t+1}) - V(S_t)
-    e_t(s) = γλ e_{t-1}(s) + 1[S_t = s]
-    V(s) ← V(s) + α δ_t e_t(s)  ∀s
+    Î´_t = R_{t+1} + Î³ V(S_{t+1}) - V(S_t)
+    e_t(s) = Î³Î» e_{t-1}(s) + 1[S_t = s]
+    V(s) â† V(s) + Î± Î´_t e_t(s)  âˆ€s
 
     Parameters
     ----------
@@ -253,7 +253,7 @@ def n_step_td_control(
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, ValueFunction]:
     """
-    Forward-view TD(n) + ε-greedy policy improvement on expected state values.
+    Forward-view TD(n) + Îµ-greedy policy improvement on expected state values.
     Uses a tabular V(s); greedy actions are chosen by one-step lookahead
     (requires the environment to expose env.P like Toy-Text envs).
     """
@@ -285,7 +285,7 @@ def n_step_td_control(
 
         while True:
             if t < T:
-                # ε-greedy action
+                # Îµ-greedy action
                 if rng.random() < epsilon:
                     a = int(rng.integers(n_a))
                 else:
@@ -320,7 +320,7 @@ def n_step_td_control(
 
 
 # ---------------------------------------------------------------------------
-# TD(λ) control — backward view + greedy improvement
+# TD(Î») control â€” backward view + greedy improvement
 # ---------------------------------------------------------------------------
 def td_lambda_control(
     env,
@@ -332,7 +332,7 @@ def td_lambda_control(
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, ValueFunction]:
     """
-    Backward-view TD(λ) + ε-greedy improvement on expected state values.
+    Backward-view TD(Î») + Îµ-greedy improvement on expected state values.
     Requires env.P for one-step greedy action selection.
     """
     rng = rng or np.random.default_rng()
@@ -377,3 +377,4 @@ def td_lambda_control(
         pi.probs[s, a_star] += 1.0 - epsilon
 
     return pi, V
+

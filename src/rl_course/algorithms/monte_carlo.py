@@ -1,11 +1,11 @@
-"""
+﻿"""
 Monte Carlo methods for tabular RL (model-free, episodic).
 
 Implements:
-  - mc_prediction_first_visit  : first-visit MC policy evaluation → V^π
-  - mc_prediction_every_visit  : every-visit MC policy evaluation → V^π
-  - mc_control_es              : MC Exploring Starts → π*
-  - mc_control_epsilon_greedy  : on-policy MC control with ε-greedy → π*
+  - mc_prediction_first_visit  : first-visit MC policy evaluation â†’ V^Ï€
+  - mc_prediction_every_visit  : every-visit MC policy evaluation â†’ V^Ï€
+  - mc_control_es              : MC Exploring Starts â†’ Ï€*
+  - mc_control_epsilon_greedy  : on-policy MC control with Îµ-greedy â†’ Ï€*
   - mc_control_off_policy_is   : off-policy MC control (importance sampling)
 
 Reference:
@@ -18,7 +18,7 @@ import numpy as np
 from collections import defaultdict
 from typing import Callable, Optional
 
-from rl_course_v1.mdp.policy import Policy, ValueFunction, QValueFunction
+from rl_course.mdp.policy import Policy, ValueFunction, QValueFunction
 
 
 Episode = list[tuple[int, int, float]]   # [(s, a, r), ...]
@@ -33,7 +33,7 @@ def generate_episode(
     rng: np.random.Generator,
     max_steps: int = 1_000,
 ) -> Episode:
-    """Roll out one episode following π."""
+    """Roll out one episode following Ï€."""
     episode: Episode = []
     s, _ = env.reset()
     for _ in range(max_steps):
@@ -115,8 +115,8 @@ def mc_control_epsilon_greedy(
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, QValueFunction]:
     """
-    On-policy first-visit MC control with ε-greedy exploration.
-    Returns (π*, Q*).
+    On-policy first-visit MC control with Îµ-greedy exploration.
+    Returns (Ï€*, Q*).
     """
     rng   = rng or np.random.default_rng()
     n_s   = env.observation_space.n
@@ -151,9 +151,9 @@ def mc_control_exploring_starts(
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, QValueFunction]:
     """
-    MC Exploring Starts (ES) — assumes env can be reset to any (s,a).
+    MC Exploring Starts (ES) â€” assumes env can be reset to any (s,a).
     Approximated here by random first action.
-    Returns (π*, Q*).
+    Returns (Ï€*, Q*).
     """
     rng = rng or np.random.default_rng()
     n_s = env.observation_space.n
@@ -190,3 +190,4 @@ def mc_control_exploring_starts(
         pi = Policy.greedy_from_q(Q)
 
     return pi, Q
+

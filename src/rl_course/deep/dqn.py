@@ -1,4 +1,4 @@
-"""DQN training implementation for discrete-action environments."""
+﻿"""DQN training implementation for discrete-action environments."""
 
 from __future__ import annotations
 
@@ -11,8 +11,8 @@ import torch
 import torch.nn.functional as F
 from torch import optim
 
-from rl_course_v1.networks.mlp import DiscreteQNetwork
-from rl_course_v1.replay.buffer import ReplayBuffer
+from rl_course.networks.mlp import DiscreteQNetwork
+from rl_course.replay.buffer import ReplayBuffer
 
 
 @dataclass
@@ -173,3 +173,4 @@ class DQNTrainer:
             replay.save_npz(replay_dir / "latest.npz")
 
         return online_net, metrics
+

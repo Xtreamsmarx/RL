@@ -1,7 +1,7 @@
-from setuptools import setup, find_packages
+﻿from setuptools import setup, find_packages
 
 setup(
-    name="rl-course-v1",
+    name="rl-course",
     version="1.0.0",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
@@ -18,3 +18,4 @@ setup(
         "torch>=2.2.0",
     ],
 )
+

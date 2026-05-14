@@ -1,4 +1,4 @@
-"""Deep RL agent wrapper for model-free DRL algorithms."""
+﻿"""Deep RL agent wrapper for model-free DRL algorithms."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import gymnasium as gym
 
-from rl_course_v1.deep import DQNConfig, DQNTrainer
+from rl_course.deep import DQNConfig, DQNTrainer
 
 
 @dataclass
@@ -28,3 +28,4 @@ class DeepAgent:
         model, metrics = trainer.train(env)
         env.close()
         return model, metrics
+

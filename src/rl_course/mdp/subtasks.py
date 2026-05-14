@@ -1,4 +1,4 @@
-"""
+﻿"""
 Subtask factory for standard Gymnasium environments.
 
 Subtasks partition the MDP state space into named sub-problems,
@@ -7,12 +7,12 @@ each with its own goal set and local transition structure.
 
 from __future__ import annotations
 
-from rl_course_v1.mdp.base import TabularMDP, Subtask
+from rl_course.mdp.base import TabularMDP, Subtask
 
 
 def make_frozenlake_subtasks(mdp: TabularMDP) -> list[Subtask]:
     """
-    4×4 FrozenLake-v1 subtasks.
+    4Ã—4 FrozenLake-v1 subtasks.
 
     Layout (row-major, 0-indexed):
         S F F F
@@ -24,7 +24,7 @@ def make_frozenlake_subtasks(mdp: TabularMDP) -> list[Subtask]:
       - top_left  : states  0-7   goal = [5] (avoid holes, reach mid)
       - bottom_right : states 8-15 goal = [15] (reach G)
     """
-    assert mdp.n_states == 16, "Expected 4×4 FrozenLake (16 states)."
+    assert mdp.n_states == 16, "Expected 4Ã—4 FrozenLake (16 states)."
 
     top_left = Subtask(
         name="top_left",
@@ -54,3 +54,4 @@ def make_full_task(mdp: TabularMDP) -> Subtask:
         goal_states=goal,
         mdp=mdp,
     )
+

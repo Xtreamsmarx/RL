@@ -1,9 +1,9 @@
-"""
+﻿"""
 Policy representations for tabular RL.
 
 Provides:
-  - Policy          : stochastic policy π(a|s) stored as a (S,A) probability matrix
-  - DeterministicPolicy : deterministic π(s) → a stored as an integer array
+  - Policy          : stochastic policy Ï€(a|s) stored as a (S,A) probability matrix
+  - DeterministicPolicy : deterministic Ï€(s) â†’ a stored as an integer array
   - QValueFunction  : Q(s,a) table
   - ValueFunction   : V(s) array
 """
@@ -57,7 +57,7 @@ class QValueFunction:
         self.values[key] = val
 
     def to_value_function(self, policy: "Policy") -> ValueFunction:
-        """V(s) = Σ_a π(a|s) Q(s,a)."""
+        """V(s) = Î£_a Ï€(a|s) Q(s,a)."""
         vf = ValueFunction(self.n_states)
         vf.values = np.sum(policy.probs * self.values, axis=1)
         return vf
@@ -79,7 +79,7 @@ class QValueFunction:
 # ---------------------------------------------------------------------------
 class Policy:
     """
-    Stochastic tabular policy π(a|s) stored as a (S,A) probability matrix.
+    Stochastic tabular policy Ï€(a|s) stored as a (S,A) probability matrix.
     
     Can represent both stochastic and deterministic policies.
     A deterministic policy has a single 1.0 entry per row.
@@ -111,9 +111,9 @@ class Policy:
     def greedy_from_v(cls, v: ValueFunction, mdp) -> "Policy":
         """
         Deterministic greedy policy derived from V(s) using the MDP model.
-        π(s) = argmax_a [R(s,a) + γ Σ P(s'|s,a) V(s')]
+        Ï€(s) = argmax_a [R(s,a) + Î³ Î£ P(s'|s,a) V(s')]
         """
-        from rl_course_v1.mdp.base import TabularMDP
+        from rl_course.mdp.base import TabularMDP
         assert isinstance(mdp, TabularMDP)
         pi = cls(mdp.n_states, mdp.n_actions)
         pi.probs[:] = 0.0
@@ -129,7 +129,7 @@ class Policy:
     def epsilon_greedy_from_q(
         cls, q: QValueFunction, epsilon: float
     ) -> "Policy":
-        """ε-greedy policy from Q(s,a)."""
+        """Îµ-greedy policy from Q(s,a)."""
         pi = cls(q.n_states, q.n_actions)
         pi.probs[:] = epsilon / q.n_actions
         best_actions = np.argmax(q.values, axis=1)
@@ -138,13 +138,13 @@ class Policy:
 
     # ------------------------------------------------------------------
     def act(self, s: int, rng: Optional[np.random.Generator] = None) -> int:
-        """Sample an action from π(·|s)."""
+        """Sample an action from Ï€(Â·|s)."""
         if rng is None:
             rng = np.random.default_rng()
         return int(rng.choice(self.n_actions, p=self.probs[s]))
 
     def deterministic_action(self, s: int) -> int:
-        """Return argmax_a π(a|s); only meaningful for deterministic policies."""
+        """Return argmax_a Ï€(a|s); only meaningful for deterministic policies."""
         return int(np.argmax(self.probs[s]))
 
     def copy(self) -> "Policy":
@@ -163,7 +163,7 @@ class Policy:
 class DeterministicPolicy:
     """
     Compact deterministic policy stored as an integer array.
-    Convenience wrapper when you only need π(s) → a.
+    Convenience wrapper when you only need Ï€(s) â†’ a.
     """
 
     def __init__(self, actions: np.ndarray):
@@ -185,3 +185,4 @@ class DeterministicPolicy:
 
     def __repr__(self) -> str:
         return f"DeterministicPolicy(n_states={len(self.actions)})"
+

@@ -1,5 +1,5 @@
-"""
-train.py — CLI entry point for training and evaluating tabular RL agents.
+﻿"""
+train.py â€” CLI entry point for training and evaluating tabular RL agents.
 
 Usage examples
 --------------
@@ -12,7 +12,7 @@ Usage examples
 # Policy iteration (model-based DP):
   python train.py --algorithm policy_iteration --save
 
-# Sarsa(λ) with custom hyperparameters:
+# Sarsa(Î») with custom hyperparameters:
   python train.py --algorithm sarsa_lambda --lam 0.8 --alpha 0.05 --epsilon 0.1 --n_episodes 30000
 
 Run `python train.py --help` for the full argument list.
@@ -21,7 +21,7 @@ Run `python train.py --help` for the full argument list.
 import argparse
 import gymnasium as gym
 
-from rl_course_v1.agents.agent import TabularAgent, AgentConfig
+from rl_course.agents.agent import TabularAgent, AgentConfig
 
 
 # ---------------------------------------------------------------------------
@@ -63,7 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--n_steps",    type=int,   default=4,
                    help="n for n-step methods.")
     p.add_argument("--lam",        type=float, default=0.9,
-                   help="λ for TD(λ)/Sarsa(λ).")
+                   help="Î» for TD(Î»)/Sarsa(Î»).")
     p.add_argument("--trace_cutoff", type=int, default=None,
                    help="Optional practical n-cutoff for backward-view traces.")
     p.add_argument("--seed",       type=int,   default=42)
@@ -124,3 +124,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

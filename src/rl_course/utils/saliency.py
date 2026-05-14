@@ -1,4 +1,4 @@
-"""Saliency utilities for DQN-style discrete-state models."""
+﻿"""Saliency utilities for DQN-style discrete-state models."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from rl_course_v1.networks.mlp import DiscreteQNetwork
+from rl_course.networks.mlp import DiscreteQNetwork
 
 
 def dqn_saliency_for_state(model: DiscreteQNetwork, state_index: int, n_states: int) -> np.ndarray:
@@ -36,3 +36,4 @@ def save_saliency_plot(values: np.ndarray, path: str | Path, title: str = "DQN S
     plt.tight_layout()
     plt.savefig(path, dpi=150)
     plt.close()
+

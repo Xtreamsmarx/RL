@@ -1,4 +1,4 @@
-"""Generate saliency plot for a saved DQN checkpoint."""
+﻿"""Generate saliency plot for a saved DQN checkpoint."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import argparse
 
 import torch
 
-from rl_course_v1.networks.mlp import DiscreteQNetwork
-from rl_course_v1.utils.saliency import dqn_saliency_for_state, save_saliency_plot
+from rl_course.networks.mlp import DiscreteQNetwork
+from rl_course.utils.saliency import dqn_saliency_for_state, save_saliency_plot
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,3 +36,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

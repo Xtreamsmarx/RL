@@ -1,10 +1,10 @@
-"""
+﻿"""
 Q-learning (off-policy TD control).
 
 Implements:
-  - q_learning  : one-step Q-learning → Q*
+  - q_learning  : one-step Q-learning â†’ Q*
 
-Q(S_t,A_t) ← Q(S_t,A_t) + α [R_{t+1} + γ max_{a'} Q(S_{t+1},a') − Q(S_t,A_t)]
+Q(S_t,A_t) â† Q(S_t,A_t) + Î± [R_{t+1} + Î³ max_{a'} Q(S_{t+1},a') âˆ’ Q(S_t,A_t)]
 
 Reference:
   Watkins & Dayan (1992); Sutton & Barto Ch. 6.5 (2018).
@@ -15,7 +15,7 @@ from __future__ import annotations
 import numpy as np
 from typing import Optional
 
-from rl_course_v1.mdp.policy import Policy, QValueFunction
+from rl_course.mdp.policy import Policy, QValueFunction
 
 
 def q_learning(
@@ -29,12 +29,12 @@ def q_learning(
     """
     Tabular Q-learning (off-policy, one-step TD).
 
-    Behaviour policy : ε-greedy w.r.t. current Q
+    Behaviour policy : Îµ-greedy w.r.t. current Q
     Target policy    : greedy (max_a Q)
 
     Returns
     -------
-    (π*, Q*)
+    (Ï€*, Q*)
     """
     rng = rng or np.random.default_rng()
     n_s = env.observation_space.n
@@ -46,7 +46,7 @@ def q_learning(
         done = False
 
         while not done:
-            # ε-greedy behaviour policy
+            # Îµ-greedy behaviour policy
             if rng.random() < epsilon:
                 a = int(rng.integers(n_a))
             else:
@@ -63,3 +63,4 @@ def q_learning(
 
     pi = Policy.epsilon_greedy_from_q(Q, epsilon)
     return pi, Q
+

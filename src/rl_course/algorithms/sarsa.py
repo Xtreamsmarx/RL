@@ -1,13 +1,13 @@
-"""
-Sarsa algorithms — on-policy TD control operating on Q-values.
+﻿"""
+Sarsa algorithms â€” on-policy TD control operating on Q-values.
 
 Implements:
-  - sarsa_zero          : one-step Sarsa → Q^π
-  - n_step_sarsa        : forward-view Sarsa(n) → Q*
-    - sarsa_lambda_forward: forward-view Sarsa(λ) → Q*
-  - sarsa_lambda        : backward-view Sarsa(λ) via eligibility traces → Q*
+  - sarsa_zero          : one-step Sarsa â†’ Q^Ï€
+  - n_step_sarsa        : forward-view Sarsa(n) â†’ Q*
+    - sarsa_lambda_forward: forward-view Sarsa(Î») â†’ Q*
+  - sarsa_lambda        : backward-view Sarsa(Î») via eligibility traces â†’ Q*
 
-All methods use ε-greedy exploration and improve Q(s,a) directly.
+All methods use Îµ-greedy exploration and improve Q(s,a) directly.
 
 Reference:
   Sutton & Barto Ch. 6.4, 7.2, 12.7 (2018).
@@ -18,7 +18,7 @@ from __future__ import annotations
 import numpy as np
 from typing import Optional
 
-from rl_course_v1.mdp.policy import Policy, QValueFunction
+from rl_course.mdp.policy import Policy, QValueFunction
 
 
 def _lambda_return_q_from_t(
@@ -65,7 +65,7 @@ def sarsa_zero(
     """
     One-step on-policy Sarsa.
 
-    Q(S_t,A_t) ← Q(S_t,A_t) + α [R_{t+1} + γ Q(S_{t+1},A_{t+1}) − Q(S_t,A_t)]
+    Q(S_t,A_t) â† Q(S_t,A_t) + Î± [R_{t+1} + Î³ Q(S_{t+1},A_{t+1}) âˆ’ Q(S_t,A_t)]
     """
     rng = rng or np.random.default_rng()
     n_s = env.observation_space.n
@@ -109,8 +109,8 @@ def n_step_sarsa(
     """
     n-step on-policy Sarsa (forward view / bootstrapped Q-values).
 
-    G_{t:t+n} = R_{t+1} + … + γ^{n-1} R_{t+n} + γ^n Q(S_{t+n}, A_{t+n})
-    Q(S_t, A_t) ← Q(S_t, A_t) + α [G_{t:t+n} − Q(S_t, A_t)]
+    G_{t:t+n} = R_{t+1} + â€¦ + Î³^{n-1} R_{t+n} + Î³^n Q(S_{t+n}, A_{t+n})
+    Q(S_t, A_t) â† Q(S_t, A_t) + Î± [G_{t:t+n} âˆ’ Q(S_t, A_t)]
     """
     rng = rng or np.random.default_rng()
     n_s = env.observation_space.n
@@ -162,7 +162,7 @@ def n_step_sarsa(
 
 
 # ---------------------------------------------------------------------------
-# Sarsa(λ)  — backward view (eligibility traces)
+# Sarsa(Î»)  â€” backward view (eligibility traces)
 # ---------------------------------------------------------------------------
 def sarsa_lambda(
     env,
@@ -176,18 +176,18 @@ def sarsa_lambda(
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, QValueFunction]:
     """
-    Backward-view Sarsa(λ) with eligibility traces.
+    Backward-view Sarsa(Î») with eligibility traces.
 
-    δ_t = R_{t+1} + γ Q(S_{t+1},A_{t+1}) − Q(S_t,A_t)
-    e_t(s,a) = γλ e_{t-1}(s,a) + 1[S_t=s, A_t=a]   (accumulating)
-             = γλ e_{t-1}(s,a) (if already visited) | 1 (current)  (replacing)
-    Q(s,a) ← Q(s,a) + α δ_t e_t(s,a)  ∀s,a
+    Î´_t = R_{t+1} + Î³ Q(S_{t+1},A_{t+1}) âˆ’ Q(S_t,A_t)
+    e_t(s,a) = Î³Î» e_{t-1}(s,a) + 1[S_t=s, A_t=a]   (accumulating)
+             = Î³Î» e_{t-1}(s,a) (if already visited) | 1 (current)  (replacing)
+    Q(s,a) â† Q(s,a) + Î± Î´_t e_t(s,a)  âˆ€s,a
 
     Parameters
     ----------
     replacing_traces : bool
-        True  → replacing traces (clips eligibility at 1, reduces variance).
-        False → accumulating traces (standard).
+        True  â†’ replacing traces (clips eligibility at 1, reduces variance).
+        False â†’ accumulating traces (standard).
     trace_cutoff : Optional[int]
         Optional practical n-cutoff variant. If set, traces with tiny
         weights below (gamma * lam)^trace_cutoff are truncated to zero.
@@ -285,3 +285,4 @@ def sarsa_lambda_forward(
 
     pi = Policy.epsilon_greedy_from_q(Q, epsilon)
     return pi, Q
+

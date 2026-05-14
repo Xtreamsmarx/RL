@@ -1,4 +1,4 @@
-"""
+﻿"""
 Agent framework.
 
 AgentConfig  : dataclass of all hyperparameters
@@ -15,8 +15,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Callable
 
-from rl_course_v1.mdp.base   import TabularMDP, Subtask
-from rl_course_v1.mdp.policy import Policy, ValueFunction, QValueFunction
+from rl_course.mdp.base   import TabularMDP, Subtask
+from rl_course.mdp.policy import Policy, ValueFunction, QValueFunction
 
 
 # ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class AgentConfig:
     # TD(n) / Sarsa(n)
     n_steps: int = 4
 
-    # TD(λ) / Sarsa(λ)
+    # TD(Î») / Sarsa(Î»)
     lam:              float = 0.9
     trace_cutoff: Optional[int] = None
     replacing_traces: bool  = True
@@ -49,10 +49,10 @@ class AgentConfig:
 
 
 # ---------------------------------------------------------------------------
-# Algorithm registry  (algorithm name → callable)
+# Algorithm registry  (algorithm name â†’ callable)
 # ---------------------------------------------------------------------------
 def _build_registry() -> dict[str, Callable]:
-    from rl_course_v1.algorithms import (
+    from rl_course.algorithms import (
         policy_iteration, q_policy_iteration, value_iteration,
         mc_control_epsilon_greedy, mc_control_exploring_starts,
         td0_prediction, n_step_td_control, td_lambda_control,
@@ -125,7 +125,7 @@ class TabularAgent:
             )
 
         print(f"[TabularAgent] Training with algorithm='{alg}' "
-              f"for {cfg.n_episodes} episodes …")
+              f"for {cfg.n_episodes} episodes â€¦")
         t0 = time.perf_counter()
 
         # DP methods need the TabularMDP wrapper, not the raw env
@@ -133,7 +133,7 @@ class TabularAgent:
             mdp = TabularMDP(env, gamma=cfg.gamma)
             result = fn(mdp)
         elif alg in ("td0",):
-            from rl_course_v1.mdp.policy import Policy
+            from rl_course.mdp.policy import Policy
             pi  = Policy.uniform(env.observation_space.n, env.action_space.n)
             result = fn(env, pi,
                         n_episodes=cfg.n_episodes,
@@ -141,7 +141,7 @@ class TabularAgent:
                         gamma=cfg.gamma,
                         rng=self._rng)
         elif alg in ("td_lambda_forward",):
-            from rl_course_v1.mdp.policy import Policy
+            from rl_course.mdp.policy import Policy
             pi = Policy.uniform(env.observation_space.n, env.action_space.n)
             result = fn(env, pi,
                         lam=cfg.lam,
@@ -309,3 +309,4 @@ class TabularAgent:
         agent.Q      = payload["Q"]
         print(f"[TabularAgent] Loaded from {path}")
         return agent
+
