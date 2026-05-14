@@ -1,8 +1,8 @@
 {
-  "mean_return": 0.0,
-  "std_return": 0.0,
-  "mean_loss": 0.0,
-  "episodes": 5,
-  "steps": 30,
+  "mean_return": 0.046,
+  "std_return": 0.20948508300115307,
+  "mean_loss": 0.018272927165866933,
+  "episodes": 1500,
+  "steps": 15828,
   "device": "cpu"
 }
