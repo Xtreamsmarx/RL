@@ -510,11 +510,31 @@ body {
     padding: 1.5rem;
     border-radius: 12px;
     box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.training-chart {
+    height: 320px;
+}
+
+.training-chart-large {
+    height: 380px;
 }
 
 .training-chart h3, .training-chart-large h3 {
     color: var(--primary);
     margin-bottom: 1rem;
+}
+
+#convergenceChart,
+#returnsChart,
+#lossChart,
+#epsilonChart {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100%;
 }
 
 canvas {
@@ -847,6 +867,11 @@ canvas {
 
     .training-grid {
         grid-template-columns: 1fr;
+    }
+
+    .training-chart,
+    .training-chart-large {
+        height: 300px;
     }
 
     .comparison-table-wrapper {
