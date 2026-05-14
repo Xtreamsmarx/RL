@@ -1,0 +1,643 @@
+/* ========================================
+   RL CAPSTONE V3 - VISUAL SHOWCASE CSS
+   ======================================== */
+
+:root {
+    --primary: #1e3c72;
+    --secondary: #2a5298;
+    --accent: #00d4ff;
+    --success: #10b981;
+    --danger: #ef4444;
+    --bg-light: #f8fafc;
+    --bg-dark: #0f172a;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --border: #e2e8f0;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    padding: 2rem 0;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* ========================================
+   SIDEBAR NAVIGATION
+   ======================================== */
+
+.sidebar-nav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    background: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 1rem 0;
+}
+
+.sidebar-nav li {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav a:hover {
+    background: var(--bg-light);
+    color: var(--accent);
+}
+
+.sidebar-nav li.active {
+    border-left-color: var(--accent);
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.sidebar-nav li.active a {
+    color: var(--accent);
+}
+
+/* ========================================
+   MAIN CONTENT LAYOUT
+   ======================================== */
+
+.main-content {
+    margin-left: 220px;
+    padding: 2rem 0;
+    min-height: calc(100vh - 200px);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-content h2 {
+    color: var(--primary);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 1rem;
+}
+
+.section-desc {
+    color: var(--text-light);
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+}
+
+/* ========================================
+   ENVIRONMENT SECTION
+   ======================================== */
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.viz-panel, .info-panel {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+}
+
+.grid-viz {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.grid-legend {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.detail-card {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.detail-label {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.detail-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0.5rem 0;
+}
+
+.detail-card p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.grid-layout {
+    background: var(--bg-light);
+    padding: 1.5rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.viz-full-width {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+}
+
+.dynamics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.dynamic-card {
+    background: var(--bg-light);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+.dynamic-card h4 {
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+.dynamic-card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   POLICY SECTION
+   ======================================== */
+
+.policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.policy-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.policy-canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: var(--bg-light);
+    margin: 1rem 0;
+}
+
+.policy-desc {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.policy-legend {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    margin-top: 1rem;
+}
+
+.legend-row {
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+/* ========================================
+   HEATMAP SECTION
+   ======================================== */
+
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.heatmap-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.heatmap-canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.gradient-bar {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   NETWORK SECTION
+   ======================================== */
+
+.network-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+}
+
+.network-viz {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.network-svg {
+    width: 100%;
+    height: auto;
+}
+
+.layer-label {
+    font-weight: 600;
+    fill: var(--primary);
+    font-size: 12px;
+}
+
+.neuron {
+    stroke: var(--primary);
+    stroke-width: 2;
+}
+
+.connection {
+    stroke: var(--text-light);
+    stroke-width: 1;
+    opacity: 0.5;
+}
+
+.dim-label {
+    font-size: 11px;
+    fill: var(--text-light);
+}
+
+.network-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.arch-detail {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+.arch-detail h4 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.arch-detail p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* ========================================
+   TRAINING SECTION
+   ======================================== */
+
+.training-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.training-chart-large {
+    grid-column: 1 / -1;
+}
+
+.training-chart, .training-chart-large {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+}
+
+.training-chart h3, .training-chart-large h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+canvas {
+    max-width: 100%;
+}
+
+/* ========================================
+   COMPARISON TABLE
+   ======================================== */
+
+.comparison-table-wrapper {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    overflow-x: auto;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.comparison-table th {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.comparison-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.comparison-table tbody tr:hover {
+    background: var(--bg-light);
+}
+
+.comparison-table strong {
+    color: var(--primary);
+}
+
+/* ========================================
+   SIMULATION SECTION
+   ======================================== */
+
+.simulation-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.sim-controls, .sim-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sim-btn {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--border);
+    background: white;
+    color: var(--text-dark);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.sim-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.sim-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.sim-display {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-display {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+}
+
+.stat {
+    background: var(--bg-light);
+    padding: 0.8rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.stat-label {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.trajectory-visualization {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+#trajCanvas {
+    background: var(--bg-light);
+    border-radius: 8px;
+    margin: 1rem auto;
+    display: block;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+.footer {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    text-align: center;
+    padding: 2rem;
+    margin-top: 4rem;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+
+    .network-container {
+        grid-template-columns: 1fr;
+    }
+
+    .simulation-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar-nav {
+        position: fixed;
+        left: -220px;
+        transition: left 0.3s ease;
+        z-index: 1000;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .policy-grid, .heatmap-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .training-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comparison-table-wrapper {
+        font-size: 0.85rem;
+    }
+
+    .comparison-table th, .comparison-table td {
+        padding: 0.6rem;
+    }
+}
