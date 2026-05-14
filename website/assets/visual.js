@@ -396,105 +396,276 @@ function generateEpsilonData() {
 // AGENT SIMULATION
 // ========================================
 
-function runSimulation(algorithmType) {
-    const policy = generatePolicy(algorithmType);
-    simulateAgent(policy);
+const SIM_STATE = {
+    algorithm: 'ql',
+    policy: [],
+    episodes: [],
+    currentEpisodeIndex: 0,
+    currentFrame: 0,
+    speed: 1,
+    isPlaying: false,
+    timerId: null,
+    totalEpisodes: 150,
+    maxEpisodeSteps: 28,
+    chart: null
+};
 
-    // Update active button
-    document.querySelectorAll('.sim-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.textContent.includes(algorithmType === 'ql' ? 'Q-Learning' : 
-            algorithmType === 'sarsa' ? 'SARSA' : 
-            algorithmType === 'td' ? 'TD(λ)' : 
-            algorithmType === 'pi' ? 'Policy' : '')) {
-            btn.classList.add('active');
+function runSimulation(algorithmType, triggerElement = null) {
+    SIM_STATE.algorithm = algorithmType;
+    SIM_STATE.policy = generatePolicy(algorithmType);
+    SIM_STATE.episodes = generateEpisodeBatch(SIM_STATE.policy, SIM_STATE.totalEpisodes, algorithmType);
+    SIM_STATE.currentEpisodeIndex = 0;
+    SIM_STATE.currentFrame = 0;
+    SIM_STATE.isPlaying = false;
+    stopPlaybackTimer();
+
+    updateAlgorithmButtons(triggerElement, algorithmType);
+    renderCurrentEpisodeFrame();
+    updateSimulationStats();
+    updateEpisodeNarrative();
+    updateTimelineChart();
+    updatePlaybackButton();
+}
+
+function generateEpisodeBatch(policy, count, algorithmType) {
+    const profiles = {
+        ql: { initialEps: 0.22, decay: 0.987 },
+        sarsa: { initialEps: 0.18, decay: 0.989 },
+        td: { initialEps: 0.20, decay: 0.988 },
+        pi: { initialEps: 0.04, decay: 0.996 }
+    };
+    const profile = profiles[algorithmType] || profiles.ql;
+    const episodes = [];
+
+    for (let ep = 0; ep < count; ep++) {
+        const epsRate = Math.max(0.01, profile.initialEps * Math.pow(profile.decay, ep));
+        episodes.push(generateSingleEpisode(policy, epsRate, ep));
+    }
+
+    return episodes;
+}
+
+function generateSingleEpisode(policy, explorationRate, episodeIndex) {
+    let currentState = CONFIG.frozenLake.start;
+    const path = [currentState];
+    const decisions = [];
+    let success = false;
+    let terminated = false;
+
+    for (let step = 0; step < SIM_STATE.maxEpisodeSteps; step++) {
+        const greedyAction = policy[currentState] ?? 0;
+        const explore = Math.random() < explorationRate;
+        const action = explore ? Math.floor(Math.random() * 4) : greedyAction;
+        const nextState = getNextState(currentState, action);
+
+        decisions.push({
+            step: step + 1,
+            state: currentState,
+            action,
+            greedyAction,
+            explore,
+            nextState
+        });
+
+        path.push(nextState);
+        currentState = nextState;
+
+        if (nextState === CONFIG.frozenLake.goal || CONFIG.frozenLake.holes.includes(nextState)) {
+            success = nextState === CONFIG.frozenLake.goal;
+            terminated = true;
+            break;
         }
-    });
-    
-    // Also handle event if it exists
-    if (event && event.target) {
-        event.target.classList.add('active');
+    }
+
+    return {
+        episode: episodeIndex + 1,
+        path,
+        decisions,
+        explorationRate,
+        success,
+        reward: success ? 1 : 0,
+        terminalState: path[path.length - 1],
+        terminated,
+        steps: path.length - 1
+    };
+}
+
+function togglePlayback() {
+    if (!SIM_STATE.episodes.length) {
+        return;
+    }
+
+    SIM_STATE.isPlaying = !SIM_STATE.isPlaying;
+    updatePlaybackButton();
+
+    if (SIM_STATE.isPlaying) {
+        playFromCurrentPosition();
+    } else {
+        stopPlaybackTimer();
     }
 }
 
-function simulateAgent(policy) {
-    const canvas = document.getElementById('simCanvas');
-    if (!canvas) return;
+function playFromCurrentPosition() {
+    stopPlaybackTimer();
 
+    SIM_STATE.timerId = setTimeout(() => {
+        const episode = SIM_STATE.episodes[SIM_STATE.currentEpisodeIndex];
+
+        if (!episode) {
+            SIM_STATE.isPlaying = false;
+            updatePlaybackButton();
+            return;
+        }
+
+        SIM_STATE.currentFrame += 1;
+        if (SIM_STATE.currentFrame >= episode.path.length) {
+            if (SIM_STATE.currentEpisodeIndex >= SIM_STATE.episodes.length - 1) {
+                SIM_STATE.currentFrame = episode.path.length - 1;
+                SIM_STATE.isPlaying = false;
+                updatePlaybackButton();
+            } else {
+                SIM_STATE.currentEpisodeIndex += 1;
+                SIM_STATE.currentFrame = 0;
+            }
+        }
+
+        renderCurrentEpisodeFrame();
+        updateSimulationStats();
+        updateEpisodeNarrative();
+        updateTimelineChart();
+
+        if (SIM_STATE.isPlaying) {
+            playFromCurrentPosition();
+        }
+    }, Math.max(70, Math.floor(280 / SIM_STATE.speed)));
+}
+
+function resetSimulation() {
+    SIM_STATE.currentEpisodeIndex = 0;
+    SIM_STATE.currentFrame = 0;
+    SIM_STATE.isPlaying = false;
+    stopPlaybackTimer();
+    renderCurrentEpisodeFrame();
+    updateSimulationStats();
+    updateEpisodeNarrative();
+    updateTimelineChart();
+    updatePlaybackButton();
+}
+
+function setSimulationSpeed(speed) {
+    SIM_STATE.speed = Number(speed) || 1;
+    if (SIM_STATE.isPlaying) {
+        playFromCurrentPosition();
+    }
+}
+
+function jumpToEpisode(value) {
+    const target = Math.max(1, Math.min(SIM_STATE.totalEpisodes, Number(value))) - 1;
+    SIM_STATE.currentEpisodeIndex = target;
+    SIM_STATE.currentFrame = 0;
+    renderCurrentEpisodeFrame();
+    updateSimulationStats();
+    updateEpisodeNarrative();
+    updateTimelineChart();
+}
+
+function stopPlaybackTimer() {
+    if (SIM_STATE.timerId) {
+        clearTimeout(SIM_STATE.timerId);
+        SIM_STATE.timerId = null;
+    }
+}
+
+function updatePlaybackButton() {
+    const btn = document.getElementById('simPlayPause');
+    if (!btn) {
+        return;
+    }
+    btn.textContent = SIM_STATE.isPlaying ? '⏸ Pause' : '▶ Play';
+}
+
+function updateAlgorithmButtons(triggerElement, algorithmType) {
+    document.querySelectorAll('.sim-btn[data-algo]').forEach((btn) => {
+        btn.classList.remove('active');
+        if ((triggerElement && btn === triggerElement) || btn.getAttribute('data-algo') === algorithmType) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+function renderCurrentEpisodeFrame() {
+    const episode = SIM_STATE.episodes[SIM_STATE.currentEpisodeIndex];
+    if (!episode) {
+        return;
+    }
+
+    drawSimulationGrid(episode, SIM_STATE.currentFrame);
+    drawTrajectory(episode);
+
+    const slider = document.getElementById('simEpisodeSlider');
+    if (slider) {
+        slider.value = String(SIM_STATE.currentEpisodeIndex + 1);
+    }
+
+    const currentEpisode = document.getElementById('simCurrentEpisode');
+    const totalEpisodes = document.getElementById('simTotalEpisodes');
+    if (currentEpisode) {
+        currentEpisode.textContent = String(SIM_STATE.currentEpisodeIndex + 1);
+    }
+    if (totalEpisodes) {
+        totalEpisodes.textContent = String(SIM_STATE.totalEpisodes);
+    }
+}
+
+function drawSimulationGrid(episode, frame) {
+    const canvas = document.getElementById('simCanvas');
+    if (!canvas) {
+        return;
+    }
+
+    drawGrid('simCanvas', SIM_STATE.policy);
     const ctx = canvas.getContext('2d');
     const cellSize = canvas.width / CONFIG.gridSize;
+    const safeFrame = Math.max(0, Math.min(frame, episode.path.length - 1));
 
-    // Clear canvas
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Animate traversed path until this frame.
+    ctx.strokeStyle = '#ff8a3d';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    for (let i = 0; i <= safeFrame; i++) {
+        const point = getStatePosition(episode.path[i]);
+        const px = point.col * cellSize + cellSize / 2;
+        const py = point.row * cellSize + cellSize / 2;
+        if (i === 0) {
+            ctx.moveTo(px, py);
+        } else {
+            ctx.lineTo(px, py);
+        }
+    }
+    ctx.stroke();
 
-    // Draw grid
-    drawGrid('simCanvas', policy);
+    // Current agent marker.
+    const state = episode.path[safeFrame];
+    const pos = getStatePosition(state);
+    const x = pos.col * cellSize + cellSize / 2;
+    const y = pos.row * cellSize + cellSize / 2;
 
-    // Simulate agent movement
-    let state = CONFIG.frozenLake.start;
-    let episode = 0;
-    let stepCount = 0;
-    let totalReturn = 0;
-    let successCount = 0;
+    const pulseRadius = cellSize * (0.23 + 0.05 * Math.sin(Date.now() / 140));
+    ctx.fillStyle = 'rgba(2, 214, 193, 0.35)';
+    ctx.beginPath();
+    ctx.arc(x, y, pulseRadius + 8, 0, Math.PI * 2);
+    ctx.fill();
 
-    const simulate = () => {
-        // Draw episode
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawGrid('simCanvas', policy);
+    ctx.fillStyle = CONFIG.colors.agent;
+    ctx.beginPath();
+    ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
+    ctx.fill();
 
-        // Animate agent movement
-        let currentState = CONFIG.frozenLake.start;
-        let steps = 0;
-        const maxSteps = 200;
-
-        const moveAgent = () => {
-            const action = policy[currentState];
-            const newState = getNextState(currentState, action);
-
-            // Draw agent
-            const pos = getStatePosition(currentState);
-            const x = pos.col * cellSize + cellSize / 2;
-            const y = pos.row * cellSize + cellSize / 2;
-
-            ctx.fillStyle = CONFIG.colors.agent;
-            ctx.beginPath();
-            ctx.arc(x, y, cellSize * 0.3, 0, 2 * Math.PI);
-            ctx.fill();
-
-            if (newState === CONFIG.frozenLake.goal || CONFIG.frozenLake.holes.includes(newState) || steps >= maxSteps) {
-                // Episode done
-                if (newState === CONFIG.frozenLake.goal) {
-                    totalReturn += 1;
-                    successCount += 1;
-                }
-                episode++;
-                stepCount += steps;
-
-                // Update stats
-                document.getElementById('simEpisode').textContent = episode;
-                document.getElementById('simReturn').textContent = (totalReturn / Math.max(1, episode)).toFixed(2);
-                document.getElementById('simSteps').textContent = stepCount;
-                document.getElementById('simSuccess').textContent = ((successCount / Math.max(1, episode)) * 100).toFixed(1) + '%';
-
-                // Draw trajectory
-                drawTrajectory(currentState, policy);
-
-                if (episode < 10) {
-                    setTimeout(simulate, 500);
-                }
-            } else {
-                currentState = newState;
-                steps++;
-                setTimeout(moveAgent, 100);
-            }
-        };
-
-        moveAgent();
-    };
-
-    simulate();
+    ctx.fillStyle = '#173b63';
+    ctx.font = 'bold 13px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('A', x, y);
 }
 
 function getNextState(state, action) {
@@ -510,7 +681,7 @@ function getNextState(state, action) {
     return newRow * CONFIG.gridSize + newCol;
 }
 
-function drawTrajectory(finalState, policy) {
+function drawTrajectory(episode) {
     const canvas = document.getElementById('trajCanvas');
     if (!canvas) return;
 
@@ -519,34 +690,186 @@ function drawTrajectory(finalState, policy) {
 
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawGrid('trajCanvas', policy);
+    drawGrid('trajCanvas', SIM_STATE.policy);
 
-    // Draw path from start to current
-    let state = CONFIG.frozenLake.start;
     ctx.strokeStyle = CONFIG.colors.path;
     ctx.lineWidth = 3;
     ctx.beginPath();
 
-    const startPos = getStatePosition(state);
-    ctx.moveTo(startPos.col * cellSize + cellSize / 2, startPos.row * cellSize + cellSize / 2);
-
-    for (let step = 0; step < 50; step++) {
-        const action = policy[state];
-        state = getNextState(state, action);
-
+    episode.path.forEach((state, idx) => {
         const pos = getStatePosition(state);
-        ctx.lineTo(pos.col * cellSize + cellSize / 2, pos.row * cellSize + cellSize / 2);
-
-        if (state === CONFIG.frozenLake.goal || CONFIG.frozenLake.holes.includes(state)) break;
-    }
+        const x = pos.col * cellSize + cellSize / 2;
+        const y = pos.row * cellSize + cellSize / 2;
+        if (idx === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
     ctx.stroke();
+
+    const terminal = getStatePosition(episode.path[episode.path.length - 1]);
+    ctx.fillStyle = episode.success ? '#10b981' : '#ef4444';
+    ctx.beginPath();
+    ctx.arc(terminal.col * cellSize + cellSize / 2, terminal.row * cellSize + cellSize / 2, 10, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function updateSimulationStats() {
+    if (!SIM_STATE.episodes.length) {
+        return;
+    }
+
+    const upto = SIM_STATE.currentEpisodeIndex + 1;
+    const observed = SIM_STATE.episodes.slice(0, upto);
+    const totalReward = observed.reduce((sum, ep) => sum + ep.reward, 0);
+    const totalSteps = observed.reduce((sum, ep) => sum + ep.steps, 0);
+    const successCount = observed.reduce((sum, ep) => sum + (ep.success ? 1 : 0), 0);
+    const current = SIM_STATE.episodes[SIM_STATE.currentEpisodeIndex];
+
+    setText('simEpisode', String(upto));
+    setText('simReturn', (totalReward / Math.max(1, upto)).toFixed(2));
+    setText('simSteps', String(totalSteps));
+    setText('simSuccess', `${((successCount / Math.max(1, upto)) * 100).toFixed(1)}%`);
+    setText('simOutcome', current.success ? 'Reached goal' : current.terminalState === CONFIG.frozenLake.goal ? 'Reached goal' : 'Fell or timed out');
+    setText('simPathLen', String(current.steps));
+    setText('simExploration', current.explorationRate.toFixed(2));
+}
+
+function updateEpisodeNarrative() {
+    const episode = SIM_STATE.episodes[SIM_STATE.currentEpisodeIndex];
+    if (!episode) {
+        return;
+    }
+
+    const stepIndex = Math.max(0, Math.min(SIM_STATE.currentFrame - 1, episode.decisions.length - 1));
+    const step = episode.decisions[stepIndex];
+    const actionNames = ['Up', 'Down', 'Left', 'Right'];
+
+    let message = `Episode ${episode.episode}: agent starts at state 0 and follows ${SIM_STATE.algorithm.toUpperCase()} policy.`;
+    if (step) {
+        message = `Episode ${episode.episode}, step ${step.step}: state ${step.state} -> ${step.nextState} via ${actionNames[step.action]} (${step.explore ? 'explore' : 'greedy'}).`;
+    }
+
+    setText('simDecision', message);
+
+    const notes = document.getElementById('simEpisodeNotes');
+    if (!notes) {
+        return;
+    }
+
+    const explorationShare = episode.decisions.length
+        ? episode.decisions.filter((d) => d.explore).length / episode.decisions.length
+        : 0;
+
+    notes.innerHTML = '';
+    [
+        `Terminal state: ${episode.terminalState}`,
+        `Reward: ${episode.reward.toFixed(2)}`,
+        `Steps: ${episode.steps}`,
+        `Exploratory actions: ${(explorationShare * 100).toFixed(1)}%`
+    ].forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        notes.appendChild(li);
+    });
+}
+
+function buildTimelineChart() {
+    const ctx = document.getElementById('simTimelineChart');
+    if (!ctx || SIM_STATE.chart) {
+        return;
+    }
+
+    const labels = Array.from({ length: SIM_STATE.totalEpisodes }, (_, i) => i + 1);
+    SIM_STATE.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Episode Return',
+                    data: [],
+                    borderColor: '#0c3f8f',
+                    backgroundColor: 'rgba(12, 63, 143, 0.12)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Running Success %',
+                    data: [],
+                    borderColor: '#02d6c1',
+                    tension: 0.3,
+                    pointRadius: 0,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Current Episode',
+                    data: [],
+                    borderColor: '#ff8a3d',
+                    borderWidth: 0,
+                    pointBackgroundColor: '#ff8a3d',
+                    pointRadius: 4,
+                    showLine: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 1,
+                    title: { display: true, text: 'Return' }
+                },
+                y1: {
+                    min: 0,
+                    max: 100,
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: 'Success %' }
+                },
+                x: {
+                    title: { display: true, text: 'Episode' }
+                }
+            }
+        }
+    });
+}
+
+function updateTimelineChart() {
+    if (!SIM_STATE.chart || !SIM_STATE.episodes.length) {
+        return;
+    }
+
+    const returns = SIM_STATE.episodes.map((ep) => ep.reward);
+    let successSoFar = 0;
+    const runningSuccess = SIM_STATE.episodes.map((ep, idx) => {
+        successSoFar += ep.success ? 1 : 0;
+        return (successSoFar / (idx + 1)) * 100;
+    });
+    const markerData = SIM_STATE.episodes.map((_, idx) => idx === SIM_STATE.currentEpisodeIndex ? SIM_STATE.episodes[idx].reward : null);
+
+    SIM_STATE.chart.data.datasets[0].data = returns;
+    SIM_STATE.chart.data.datasets[1].data = runningSuccess;
+    SIM_STATE.chart.data.datasets[2].data = markerData;
+    SIM_STATE.chart.update('none');
+}
+
+function setText(id, text) {
+    const node = document.getElementById(id);
+    if (node) {
+        node.textContent = text;
+    }
 }
 
 // ========================================
 // NAVIGATION
 // ========================================
 
-function switchTab(tabId) {
+function switchTab(tabId, linkElement = null) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
 
@@ -558,7 +881,11 @@ function switchTab(tabId) {
 
     // Update sidebar
     document.querySelectorAll('.sidebar-nav li').forEach(li => li.classList.remove('active'));
-    event.target.parentElement.classList.add('active');
+    if (linkElement && linkElement.parentElement) {
+        linkElement.parentElement.classList.add('active');
+    }
+
+    return false;
 }
 
 // ========================================
@@ -567,6 +894,7 @@ function switchTab(tabId) {
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeVisualizations();
+    buildTimelineChart();
 
     // Set first tab as active
     const firstTab = document.querySelector('.tab-content');
@@ -580,8 +908,14 @@ document.addEventListener('DOMContentLoaded', function() {
         firstNavItem.classList.add('active');
     }
 
-    // Initialize first simulation
-    setTimeout(() => runSimulation('ql'), 500);
+    const slider = document.getElementById('simEpisodeSlider');
+    if (slider) {
+        slider.max = String(SIM_STATE.totalEpisodes);
+    }
+
+    // Initialize first simulation with full-episode timeline.
+    runSimulation('ql');
+    togglePlayback();
 });
 
 // Export for module use

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RL V3 - Complete Visual Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/visual.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="ambient-bg" aria-hidden="true">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+    </div>
+    <header class="header">
+        <div class="container">
+            <h1>🤖 RL Capstone V3 - Visual Showcase</h1>
+            <p>Complete visualization of environments, models, policies, and training dynamics</p>
+        </div>
+    </header>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li><a href="#environment" onclick="return switchTab('environment', this)">🏔️ Environment</a></li>
+            <li><a href="#policies" onclick="return switchTab('policies', this)">🗺️ Policies</a></li>
+            <li><a href="#values" onclick="return switchTab('values', this)">📊 Values</a></li>
+            <li><a href="#network" onclick="return switchTab('network', this)">🧠 Networks</a></li>
+            <li><a href="#training" onclick="return switchTab('training', this)">📈 Training</a></li>
+            <li><a href="#comparison" onclick="return switchTab('comparison', this)">⚖️ Comparison</a></li>
+            <li><a href="#agent-sim" onclick="return switchTab('agent-sim', this)">🎮 Agent Demo</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <!-- ===== ENVIRONMENT TAB ===== -->
+        <section id="environment" class="tab-content active">
+            <div class="container">
+                <h2>🏔️ FrozenLake Environment Visualization</h2>
+                
+                <div class="grid-container">
+                    <div class="viz-panel">
+                        <h3>4×4 Grid Layout</h3>
+                        <div id="grid-canvas" class="grid-viz">
+                            <canvas id="gridCanvas" width="400" height="400"></canvas>
+                        </div>
+                        <div class="grid-legend">
+                            <div class="legend-item"><span class="legend-box" style="background:#4CAF50;"></span>Start (S)</div>
+                            <div class="legend-item"><span class="legend-box" style="background:#FFD700;"></span>Frozen (F)</div>
+                            <div class="legend-item"><span class="legend-box" style="background:#FF6B6B;"></span>Hole (H)</div>
+                            <div class="legend-item"><span class="legend-box" style="background:#2196F3;"></span>Goal (G)</div>
+                        </div>
+                    </div>
+
+                    <div class="info-panel">
+                        <h3>Environment Details</h3>
+                        <div class="details-grid">
+                            <div class="detail-card">
+                                <div class="detail-label">State Space</div>
+                                <div class="detail-value">16</div>
+                                <p>4×4 grid positions</p>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-label">Action Space</div>
+                                <div class="detail-value">4</div>
+                                <p>↑ ↓ ← →</p>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-label">Reward</div>
+                                <div class="detail-value">Goal=1</div>
+                                <p>Hole=0</p>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-label">Episodes</div>
+                                <div class="detail-value">20K+</div>
+                                <p>Training runs</p>
+                            </div>
+                        </div>
+
+                        <h4 style="margin-top: 2rem;">Grid Layout</h4>
+                        <div class="grid-layout">
+                            <p style="font-family: monospace; line-height: 1.8;">
+S F F F<br>
+F H F H<br>
+F F F H<br>
+H F F G
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viz-full-width">
+                    <h3>Environment Dynamics</h3>
+                    <div class="dynamics-grid">
+                        <div class="dynamic-card">
+                            <h4>✓ Fully Observable</h4>
+                            <p>Complete state information; no hidden observations</p>
+                        </div>
+                        <div class="dynamic-card">
+                            <h4>✓ Deterministic</h4>
+                            <p>Actions always succeed; ideal for algorithm comparison</p>
+                        </div>
+                        <div class="dynamic-card">
+                            <h4>✓ Discrete</h4>
+                            <p>Finite states and actions; enables exact methods (DP, MC)</p>
+                        </div>
+                        <div class="dynamic-card">
+                            <h4>✓ Fast</h4>
+                            <p>Episodes complete in ~100ms; rapid prototyping</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== POLICIES TAB ===== -->
+        <section id="policies" class="tab-content">
+            <div class="container">
+                <h2>🗺️ Policy Visualizations</h2>
+                <p class="section-desc">Learned policies showing optimal action from each state</p>
+
+                <div class="policy-grid">
+                    <div class="policy-card">
+                        <h3>Q-Learning Policy</h3>
+                        <canvas id="policyQL" class="policy-canvas" width="300" height="300"></canvas>
+                        <p class="policy-desc">Off-policy learning; learns greedy optimal</p>
+                    </div>
+
+                    <div class="policy-card">
+                        <h3>SARSA Policy</h3>
+                        <canvas id="policySARSA" class="policy-canvas" width="300" height="300"></canvas>
+                        <p class="policy-desc">On-policy learning; conservative/safe</p>
+                    </div>
+
+                    <div class="policy-card">
+                        <h3>TD(λ) Policy</h3>
+                        <canvas id="policyTD" class="policy-canvas" width="300" height="300"></canvas>
+                        <p class="policy-desc">Eligibility traces; efficient learning</p>
+                    </div>
+
+                    <div class="policy-card">
+                        <h3>Policy Iteration</h3>
+                        <canvas id="policyPI" class="policy-canvas" width="300" height="300"></canvas>
+                        <p class="policy-desc">Exact method; guaranteed optimal</p>
+                    </div>
+                </div>
+
+                <div class="policy-legend">
+                    <h3>Policy Legend</h3>
+                    <div class="legend-row">
+                        <span>↑ = Up | ↓ = Down | ← = Left | → = Right</span>
+                    </div>
+                    <div class="legend-row">
+                        <span>🟢 = Start | ⭐ = Goal | 🔴 = Hole | ⬜ = Frozen</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== VALUES TAB ===== -->
+        <section id="values" class="tab-content">
+            <div class="container">
+                <h2>📊 Value Function Heatmaps</h2>
+                <p class="section-desc">State value estimates (darker = higher value)</p>
+
+                <div class="heatmap-grid">
+                    <div class="heatmap-card">
+                        <h3>Q-Learning Values</h3>
+                        <canvas id="heatmapQL" class="heatmap-canvas" width="300" height="300"></canvas>
+                    </div>
+
+                    <div class="heatmap-card">
+                        <h3>SARSA Values</h3>
+                        <canvas id="heatmapSARSA" class="heatmap-canvas" width="300" height="300"></canvas>
+                    </div>
+
+                    <div class="heatmap-card">
+                        <h3>TD(λ) Values</h3>
+                        <canvas id="heatmapTD" class="heatmap-canvas" width="300" height="300"></canvas>
+                    </div>
+
+                    <div class="heatmap-card">
+                        <h3>Value Iteration (Exact)</h3>
+                        <canvas id="heatmapVI" class="heatmap-canvas" width="300" height="300"></canvas>
+                    </div>
+                </div>
+
+                <div class="gradient-bar">
+                    <div style="background: linear-gradient(to right, #000080, #FF0000); width: 100%; height: 30px; border-radius: 5px;"></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span>Low (0.0)</span>
+                        <span>Medium (0.5)</span>
+                        <span>High (1.0)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== NETWORK TAB ===== -->
+        <section id="network" class="tab-content">
+            <div class="container">
+                <h2>🧠 Neural Network Architectures</h2>
+                <p class="section-desc">Deep RL model structures</p>
+
+                <div class="network-container">
+                    <div class="network-viz">
+                        <h3>DQN Architecture</h3>
+                        <svg id="networkSVG" viewBox="0 0 600 400" class="network-svg">
+                            <!-- Input Layer -->
+                            <g id="inputLayer">
+                                <text x="20" y="20" class="layer-label">Input (One-Hot State)</text>
+                                <circle cx="60" cy="80" r="8" class="neuron" fill="#FF6B6B"></circle>
+                                <circle cx="60" cy="120" r="8" class="neuron" fill="#FF6B6B"></circle>
+                                <circle cx="60" cy="160" r="8" class="neuron" fill="#FF6B6B"></circle>
+                                <circle cx="60" cy="200" r="8" class="neuron" fill="#FF6B6B"></circle>
+                                <text x="55" y="250" class="dim-label">16 dims</text>
+                            </g>
+
+                            <!-- Hidden Layer 1 -->
+                            <g id="hidden1">
+                                <text x="180" y="20" class="layer-label">Hidden 1</text>
+                                <circle cx="220" cy="60" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <circle cx="220" cy="100" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <circle cx="220" cy="140" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <circle cx="220" cy="180" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <circle cx="220" cy="220" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <text x="210" y="250" class="dim-label">128 units</text>
+                            </g>
+
+                            <!-- Hidden Layer 2 -->
+                            <g id="hidden2">
+                                <text x="360" y="20" class="layer-label">Hidden 2</text>
+                                <circle cx="400" cy="100" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <circle cx="400" cy="160" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <circle cx="400" cy="220" r="8" class="neuron" fill="#4CAF50"></circle>
+                                <text x="390" y="270" class="dim-label">128 units</text>
+                            </g>
+
+                            <!-- Output Layer -->
+                            <g id="outputLayer">
+                                <text x="500" y="20" class="layer-label">Output Q-Values</text>
+                                <circle cx="540" cy="120" r="8" class="neuron" fill="#2196F3"></circle>
+                                <circle cx="540" cy="180" r="8" class="neuron" fill="#2196F3"></circle>
+                                <circle cx="540" cy="240" r="8" class="neuron" fill="#2196F3"></circle>
+                                <circle cx="540" cy="300" r="8" class="neuron" fill="#2196F3"></circle>
+                                <text x="530" y="340" class="dim-label">4 actions</text>
+                            </g>
+
+                            <!-- Connections -->
+                            <line x1="68" y1="80" x2="212" y2="60" class="connection"></line>
+                            <line x1="68" y1="80" x2="212" y2="100" class="connection"></line>
+                            <line x1="68" y1="120" x2="212" y2="140" class="connection"></line>
+                            <line x1="68" y1="160" x2="212" y2="180" class="connection"></line>
+                            <line x1="68" y1="200" x2="212" y2="220" class="connection"></line>
+
+                            <line x1="228" y1="60" x2="392" y2="100" class="connection"></line>
+                            <line x1="228" y1="100" x2="392" y2="160" class="connection"></line>
+                            <line x1="228" y1="140" x2="392" y2="220" class="connection"></line>
+                            <line x1="228" y1="180" x2="392" y2="100" class="connection"></line>
+                            <line x1="228" y1="220" x2="392" y2="160" class="connection"></line>
+
+                            <line x1="408" y1="100" x2="532" y2="120" class="connection"></line>
+                            <line x1="408" y1="160" x2="532" y2="180" class="connection"></line>
+                            <line x1="408" y1="220" x2="532" y2="240" class="connection"></line>
+                            <line x1="408" y1="100" x2="532" y2="300" class="connection"></line>
+                        </svg>
+                    </div>
+
+                    <div class="network-info">
+                        <h3>Architecture Details</h3>
+                        <div class="arch-detail">
+                            <h4>Input Layer</h4>
+                            <p><strong>Dimension:</strong> 16<br>
+                               <strong>Type:</strong> One-hot encoded state<br>
+                               <strong>Range:</strong> [0, 1] for each position</p>
+                        </div>
+
+                        <div class="arch-detail">
+                            <h4>Hidden Layers</h4>
+                            <p><strong>Layer 1:</strong> 128 ReLU units<br>
+                               <strong>Layer 2:</strong> 128 ReLU units<br>
+                               <strong>Activation:</strong> ReLU (Rectified Linear)</p>
+                        </div>
+
+                        <div class="arch-detail">
+                            <h4>Output Layer</h4>
+                            <p><strong>Dimension:</strong> 4 (one per action)<br>
+                               <strong>Type:</strong> Q-values<br>
+                               <strong>Loss:</strong> MSE with target network</p>
+                        </div>
+
+                        <div class="arch-detail">
+                            <h4>Training</h4>
+                            <p><strong>Optimizer:</strong> Adam (lr=1e-3)<br>
+                               <strong>Batch Size:</strong> 64<br>
+                               <strong>Replay Buffer:</strong> 50,000 transitions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TRAINING TAB ===== -->
+        <section id="training" class="tab-content">
+            <div class="container">
+                <h2>📈 Training Dynamics</h2>
+                <p class="section-desc">Learning curves for all algorithms</p>
+
+                <div class="training-grid">
+                    <div class="training-chart-large">
+                        <h3>Convergence Comparison</h3>
+                        <canvas id="convergenceChart" height="100"></canvas>
+                    </div>
+
+                    <div class="training-chart">
+                        <h3>Episode Returns (Classical)</h3>
+                        <canvas id="returnsChart"></canvas>
+                    </div>
+
+                    <div class="training-chart">
+                        <h3>DQN Loss</h3>
+                        <canvas id="lossChart"></canvas>
+                    </div>
+
+                    <div class="training-chart">
+                        <h3>Exploration Rate</h3>
+                        <canvas id="epsilonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== COMPARISON TAB ===== -->
+        <section id="comparison" class="tab-content">
+            <div class="container">
+                <h2>⚖️ Algorithm Comparison Matrix</h2>
+                <p class="section-desc">Features, performance, and characteristics</p>
+
+                <div class="comparison-table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Type</th>
+                                <th>Policy</th>
+                                <th>Bootstrap</th>
+                                <th>Model</th>
+                                <th>Speed</th>
+                                <th>Sample Eff.</th>
+                                <th>Stability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Policy Iteration</strong></td>
+                                <td>Value-based</td>
+                                <td>On</td>
+                                <td>No</td>
+                                <td>✓</td>
+                                <td>🟡</td>
+                                <td>🟢</td>
+                                <td>🟢</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Value Iteration</strong></td>
+                                <td>Value-based</td>
+                                <td>Off</td>
+                                <td>No</td>
+                                <td>✓</td>
+                                <td>🟢</td>
+                                <td>🟢</td>
+                                <td>🟢</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MC ε-Greedy</strong></td>
+                                <td>Value-based</td>
+                                <td>On</td>
+                                <td>No</td>
+                                <td>✗</td>
+                                <td>🟡</td>
+                                <td>🟡</td>
+                                <td>🟡</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Q-Learning</strong></td>
+                                <td>Value-based</td>
+                                <td>Off</td>
+                                <td>✓</td>
+                                <td>✗</td>
+                                <td>🟢</td>
+                                <td>🟢</td>
+                                <td>🟡</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SARSA</strong></td>
+                                <td>Value-based</td>
+                                <td>On</td>
+                                <td>✓</td>
+                                <td>✗</td>
+                                <td>🟢</td>
+                                <td>🟡</td>
+                                <td>🟢</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TD(λ)</strong></td>
+                                <td>Value-based</td>
+                                <td>On</td>
+                                <td>✓</td>
+                                <td>✗</td>
+                                <td>🟢</td>
+                                <td>🟡</td>
+                                <td>🟡</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DQN</strong></td>
+                                <td>Value-based</td>
+                                <td>Off</td>
+                                <td>✓</td>
+                                <td>✗</td>
+                                <td>🟡</td>
+                                <td>🟡</td>
+                                <td>🟡</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <p><strong>Legend:</strong> 🟢 = Excellent | 🟡 = Good | 🔴 = Limited | ✓ = Yes | ✗ = No</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== AGENT SIMULATION TAB ===== -->
+        <section id="agent-sim" class="tab-content">
+            <div class="container">
+                <h2>🎮 Episode-by-Episode Agent Cinema</h2>
+                <p class="section-desc">Animate every episode with timeline controls, speed tuning, and decision-level details</p>
+
+                <div class="simulation-container enhanced">
+                    <div class="sim-controls">
+                        <h3>Agent Selection</h3>
+                        <button onclick="runSimulation('ql', this)" class="sim-btn active" data-algo="ql">Q-Learning</button>
+                        <button onclick="runSimulation('sarsa', this)" class="sim-btn" data-algo="sarsa">SARSA</button>
+                        <button onclick="runSimulation('td', this)" class="sim-btn" data-algo="td">TD(λ)</button>
+                        <button onclick="runSimulation('pi', this)" class="sim-btn" data-algo="pi">Policy Iter</button>
+
+                        <h3 style="margin-top: 1rem;">Playback Controls</h3>
+                        <div class="playback-row">
+                            <button id="simPlayPause" class="sim-btn secondary" onclick="togglePlayback()">▶ Play</button>
+                            <button id="simReset" class="sim-btn secondary" onclick="resetSimulation()">↺ Reset</button>
+                        </div>
+
+                        <label class="control-label" for="simSpeed">Speed</label>
+                        <select id="simSpeed" class="sim-select" onchange="setSimulationSpeed(this.value)">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="2">2x</option>
+                            <option value="3">3x</option>
+                        </select>
+
+                        <label class="control-label" for="simEpisodeSlider">Episode Timeline</label>
+                        <input id="simEpisodeSlider" type="range" min="1" max="150" value="1" oninput="jumpToEpisode(this.value)">
+                        <div class="episode-index">
+                            <span>Episode <strong id="simCurrentEpisode">1</strong></span>
+                            <span>Total <strong id="simTotalEpisodes">150</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="sim-display layered">
+                        <canvas id="simCanvas" width="440" height="440"></canvas>
+                    </div>
+
+                    <div class="sim-stats">
+                        <h3>Episode Statistics</h3>
+                        <div class="stat-display">
+                            <div class="stat">
+                                <div class="stat-label">Episode</div>
+                                <div class="stat-value" id="simEpisode">1</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Mean Return</div>
+                                <div class="stat-value" id="simReturn">0.00</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Total Steps</div>
+                                <div class="stat-value" id="simSteps">0</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Success Rate</div>
+                                <div class="stat-value" id="simSuccess">0%</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Outcome</div>
+                                <div class="stat-value small" id="simOutcome">In progress</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Path Length</div>
+                                <div class="stat-value" id="simPathLen">0</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-label">Exploration</div>
+                                <div class="stat-value" id="simExploration">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <h3>All Episodes Timeline</h3>
+                    <p class="timeline-desc">Return and success-trend across the full training rollout with a moving episode cursor</p>
+                    <canvas id="simTimelineChart" height="110"></canvas>
+                </div>
+
+                <div class="trajectory-visualization">
+                    <h3>Trajectory and Decision Log</h3>
+                    <div class="trajectory-grid">
+                        <div>
+                            <canvas id="trajCanvas" width="420" height="420"></canvas>
+                        </div>
+                        <div class="decision-panel">
+                            <h4>Current Decision Snapshot</h4>
+                            <p id="simDecision">Episode 1 starts at state 0 and follows the learned greedy policy.</p>
+                            <h4 style="margin-top: 1.2rem;">Episode Notes</h4>
+                            <ul id="simEpisodeNotes" class="notes-list">
+                                <li>Waiting for simulation playback.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>RL Course V3 Visual Showcase | Interactive Algorithm Visualization Dashboard</p>
+    </footer>
+
+    <script src="assets/visual.js"></script>
+</body>
+</html>
