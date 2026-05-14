@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RL Course V3 - Algorithm Showcase</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <h1 class="logo">🤖 RL Capstone V3</h1>
+                <ul class="nav-links">
+                    <li><a href="#overview" onclick="showSection('overview')">Overview</a></li>
+                    <li><a href="#algorithms" onclick="showSection('algorithms')">Algorithms</a></li>
+                    <li><a href="#results" onclick="showSection('results')">Results</a></li>
+                    <li><a href="#decisions" onclick="showSection('decisions')">Decisions</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+
+            <!-- ===== OVERVIEW SECTION ===== -->
+            <section id="overview" class="section active">
+                <h2>Reinforcement Learning Capstone - Version 3</h2>
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="stat-number">14</div>
+                        <div class="stat-label">Classical Algorithms</div>
+                        <p>Complete coverage from Dynamic Programming to TD(λ)</p>
+                    </div>
+                    <div class="overview-card">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Deep RL Algorithm</div>
+                        <p>DQN with replay buffers and target networks</p>
+                    </div>
+                    <div class="overview-card">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Reproducible</div>
+                        <p>Fully seeded and logged with metrics</p>
+                    </div>
+                    <div class="overview-card">
+                        <div class="stat-number">4×4</div>
+                        <div class="stat-label">Environment</div>
+                        <p>FrozenLake-v1 discrete state/action space</p>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <h3>V3 Highlights</h3>
+                    <ul class="highlights">
+                        <li><strong>Strategic Choices:</strong> Clear justification for which algorithms were implemented and why</li>
+                        <li><strong>Deliberate Non-Implementations:</strong> Documented reasoning for what was excluded (swarm coordination, continuous control, etc.)</li>
+                        <li><strong>Production Ready:</strong> All 15 algorithms validated and functional</li>
+                        <li><strong>Fully Documented:</strong> Technical challenges, decision rationale, and attributions included</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ===== ALGORITHMS SECTION ===== -->
+            <section id="algorithms" class="section">
+                <h2>Algorithm Coverage</h2>
+                
+                <div class="algorithm-tabs">
+                    <button class="tab-btn active" onclick="showAlgoTab('dp')">Dynamic Programming</button>
+                    <button class="tab-btn" onclick="showAlgoTab('mc')">Monte Carlo</button>
+                    <button class="tab-btn" onclick="showAlgoTab('td')">Temporal Difference</button>
+                    <button class="tab-btn" onclick="showAlgoTab('sarsa')">SARSA</button>
+                    <button class="tab-btn" onclick="showAlgoTab('deep')">Deep RL</button>
+                </div>
+
+                <!-- DP Tab -->
+                <div id="dp-tab" class="algo-tab active">
+                    <h3>Dynamic Programming (Exact Methods)</h3>
+                    <div class="algo-grid">
+                        <div class="algo-card">
+                            <h4>Policy Iteration</h4>
+                            <p class="algo-type">Value-based | On-policy</p>
+                            <p>Alternates between policy evaluation and improvement until convergence. Requires model knowledge.</p>
+                            <div class="algo-features">
+                                <span>✓ Exact</span>
+                                <span>✓ Guaranteed Convergence</span>
+                                <span>✗ Requires Model</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>Value Iteration</h4>
+                            <p class="algo-type">Value-based | Off-policy</p>
+                            <p>Combines policy evaluation and improvement in single step. Computationally efficient exact method.</p>
+                            <div class="algo-features">
+                                <span>✓ Exact</span>
+                                <span>✓ Efficient</span>
+                                <span>✗ Requires Model</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MC Tab -->
+                <div id="mc-tab" class="algo-tab">
+                    <h3>Monte Carlo (Model-Free Averaging)</h3>
+                    <div class="algo-grid">
+                        <div class="algo-card">
+                            <h4>MC Exploring-Starts</h4>
+                            <p class="algo-type">Value-based | On-policy Control</p>
+                            <p>Random episode starts; averages full episode returns. Unbiased but high variance.</p>
+                            <div class="algo-features">
+                                <span>✓ Model-Free</span>
+                                <span>✓ Unbiased</span>
+                                <span>✗ Requires Exploring Starts</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>MC ε-Greedy</h4>
+                            <p class="algo-type">Value-based | On-policy Control</p>
+                            <p>Epsilon-greedy exploration; practical alternative to exploring starts.</p>
+                            <div class="algo-features">
+                                <span>✓ Model-Free</span>
+                                <span>✓ Practical</span>
+                                <span>✓ ε-Greedy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TD Tab -->
+                <div id="td-tab" class="algo-tab">
+                    <h3>Temporal Difference (Bootstrapping)</h3>
+                    <div class="algo-grid">
+                        <div class="algo-card">
+                            <h4>TD(0) Prediction</h4>
+                            <p class="algo-type">Value-based | On-policy</p>
+                            <p>Single-step bootstrapping. Foundation for all TD methods.</p>
+                            <div class="algo-features">
+                                <span>✓ Model-Free</span>
+                                <span>✓ Bootstrap</span>
+                                <span>✓ Low Variance</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>n-Step TD Control</h4>
+                            <p class="algo-type">Value-based | On-policy</p>
+                            <p>Multi-step returns; balance between TD(0) bias and MC variance.</p>
+                            <div class="algo-features">
+                                <span>✓ Tunable Bias-Variance</span>
+                                <span>✓ Bootstrap</span>
+                                <span>✗ Needs Lookahead</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>TD(λ) Forward-View</h4>
+                            <p class="algo-type">Value-based | On-policy</p>
+                            <p>Weighted average of n-step returns via λ parameter.</p>
+                            <div class="algo-features">
+                                <span>✓ Elegant Theory</span>
+                                <span>✓ λ-Returns</span>
+                                <span>✗ Offline</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>TD(λ) Backward-View</h4>
+                            <p class="algo-type">Value-based | On-policy</p>
+                            <p>Eligibility traces; equivalent to forward-view but online and efficient.</p>
+                            <div class="algo-features">
+                                <span>✓ Online</span>
+                                <span>✓ Efficient</span>
+                                <span>✓ Traces</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>Q-Learning</h4>
+                            <p class="algo-type">Value-based | Off-policy Control</p>
+                            <p>Off-policy learning; learns optimal policy while following exploratory behavior policy.</p>
+                            <div class="algo-features">
+                                <span>✓ Off-Policy</span>
+                                <span>✓ Optimal</span>
+                                <span>✓ Industry Standard</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SARSA Tab -->
+                <div id="sarsa-tab" class="algo-tab">
+                    <h3>SARSA (On-Policy Action-Value)</h3>
+                    <div class="algo-grid">
+                        <div class="algo-card">
+                            <h4>SARSA(0)</h4>
+                            <p class="algo-type">Action-Value | On-policy</p>
+                            <p>Single-step on-policy control. Uses actual next action (not greedy).</p>
+                            <div class="algo-features">
+                                <span>✓ On-Policy</span>
+                                <span>✓ Safe</span>
+                                <span>✓ Conservative</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>n-Step SARSA</h4>
+                            <p class="algo-type">Action-Value | On-policy</p>
+                            <p>Multi-step on-policy control; practical exploration-exploitation balance.</p>
+                            <div class="algo-features">
+                                <span>✓ On-Policy</span>
+                                <span>✓ Multi-Step</span>
+                                <span>✓ Tunable</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>SARSA(λ) Forward-View</h4>
+                            <p class="algo-type">Action-Value | On-policy</p>
+                            <p>On-policy eligibility traces; λ-returns for action-values.</p>
+                            <div class="algo-features">
+                                <span>✓ On-Policy</span>
+                                <span>✓ λ-Returns</span>
+                                <span>✓ Traces</span>
+                            </div>
+                        </div>
+                        <div class="algo-card">
+                            <h4>SARSA(λ) Backward-View</h4>
+                            <p class="algo-type">Action-Value | On-policy</p>
+                            <p>Efficient online on-policy traces; practical replacement/accumulating trace options.</p>
+                            <div class="algo-features">
+                                <span>✓ Online</span>
+                                <span>✓ Efficient</span>
+                                <span>✓ Flexible</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Tab -->
+                <div id="deep-tab" class="algo-tab">
+                    <h3>Deep Reinforcement Learning</h3>
+                    <div class="algo-grid">
+                        <div class="algo-card full-width">
+                            <h4>Deep Q-Network (DQN)</h4>
+                            <p class="algo-type">Neural Network | Value-based | Off-policy Control</p>
+                            <p>Neural network approximation of Q-values with experience replay and target networks. Stabilizes deep Q-learning with two key innovations:</p>
+                            <div class="dqn-features">
+                                <strong>Online Network:</strong> Updated every step via gradient descent<br/>
+                                <strong>Target Network:</strong> Separate network for target estimation, updated periodically<br/>
+                                <strong>Experience Replay:</strong> Samples transitions from buffer to break correlation<br/>
+                                <strong>ε-Decay Exploration:</strong> Starts high, decays over episodes
+                            </div>
+                            <div class="algo-features">
+                                <span>✓ Discrete Actions</span>
+                                <span>✓ Off-Policy</span>
+                                <span>✓ Stable Training</span>
+                                <span>✓ Deep RL Baseline</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== RESULTS SECTION ===== -->
+            <section id="results" class="section">
+                <h2>Results & Visualizations</h2>
+                
+                <div class="results-container">
+                    <div class="results-panel">
+                        <h3>Classical RL Comparison</h3>
+                        <div id="classical-chart-container">
+                            <canvas id="classicalChart"></canvas>
+                        </div>
+                        <p class="chart-note">Note: Results shown are from recent training runs. Higher values indicate better performance.</p>
+                    </div>
+
+                    <div class="results-panel">
+                        <h3>Algorithm Category Distribution</h3>
+                        <div id="category-chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="results-panel full-width">
+                        <h3>Deep RL Training Progress (DQN)</h3>
+                        <div id="dqn-chart-container">
+                            <canvas id="dqnChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="results-panel full-width">
+                        <h3>Available Visualizations</h3>
+                        <div class="visualization-grid">
+                            <div class="vis-card">
+                                <h4>Saliency Maps</h4>
+                                <p>Gradient-based state importance for DQN agent</p>
+                                <button onclick="alert('Saliency maps are saved in result/figures/')">View Files</button>
+                            </div>
+                            <div class="vis-card">
+                                <h4>Training Curves</h4>
+                                <p>Return and loss trajectories for each run</p>
+                                <button onclick="alert('Training curves saved in result/figures/')">View Files</button>
+                            </div>
+                            <div class="vis-card">
+                                <h4>Overview Plots</h4>
+                                <p>Consolidated visualizations across all runs</p>
+                                <button onclick="alert('Overview plots in visualization/')">View Files</button>
+                            </div>
+                            <div class="vis-card">
+                                <h4>Run History (CSV)</h4>
+                                <p>Complete metrics log for all training runs</p>
+                                <button onclick="alert('CSV data in result/csv/')">View Files</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== DECISIONS SECTION ===== -->
+            <section id="decisions" class="section">
+                <h2>V3 Strategic Decisions</h2>
+                
+                <div class="decisions-container">
+                    <div class="decision-card">
+                        <h3>✅ What Was Implemented</h3>
+                        <div class="decision-content">
+                            <h4>Classical RL (14 Algorithms)</h4>
+                            <p>Complete pedagogical coverage:</p>
+                            <ul>
+                                <li><strong>DP:</strong> Policy Iteration, Value Iteration (exact methods)</li>
+                                <li><strong>MC:</strong> Exploring-starts, ε-greedy (model-free averaging)</li>
+                                <li><strong>TD Prediction:</strong> TD(0), TD(λ) forward-view (bootstrapping)</li>
+                                <li><strong>TD Control:</strong> n-step TD, TD(λ) backward-view, Q-learning (multi-step methods)</li>
+                                <li><strong>SARSA:</strong> SARSA(0), n-step SARSA, SARSA(λ) forward/backward (on-policy)</li>
+                            </ul>
+
+                            <h4>Deep RL (1 Algorithm)</h4>
+                            <p><strong>DQN:</strong> Discrete action Q-learning with replay buffer, target networks, and ε-decay exploration</p>
+
+                            <h4>Environment</h4>
+                            <p><strong>FrozenLake-v1:</strong> 4×4 grid, discrete state/action, deterministic (ideal for learning progression)</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-card">
+                        <h3>❌ What Was NOT Implemented (& Why)</h3>
+                        <div class="decision-content">
+                            <h4>❌ Swarm Coordination & Multi-Agent RL</h4>
+                            <p><em>Reason:</em> Single-agent environment. Coordination mechanisms are orthogonal to capstone scope.</p>
+
+                            <h4>❌ Continuous Control (PPO, TRPO, SAC, DDPG, TD3)</h4>
+                            <p><em>Reason:</em> Discrete action space. Continuous RL overkill for FrozenLake; DQN is architecturally superior.</p>
+
+                            <h4>❌ Model-Based Methods (MCTS, Planning)</h4>
+                            <p><em>Reason:</em> Fully observable, deterministic environment. No need for learned model; model-free dominates.</p>
+
+                            <h4>❌ Hierarchical RL / Options Framework</h4>
+                            <p><em>Reason:</em> 16-state space lacks natural task hierarchy. Temporal abstraction unjustified.</p>
+
+                            <h4>❌ Rainbow DQN (6-Component Enhancement)</h4>
+                            <p><em>Reason:</em> Each component (prioritized replay, dueling, distributional) adds complexity exceeding pedagogical return for FrozenLake's simplicity.</p>
+
+                            <h4>❌ Bayesian Hyperparameter Tuning</h4>
+                            <p><em>Reason:</em> Simple hyperparameters (α, γ, λ, ε) have clear ranges. Brute-force grid search faster than Bayesian optimization.</p>
+
+                            <h4>❌ Meta-Learning & Few-Shot Adaptation</h4>
+                            <p><em>Reason:</em> Single-task environment. Meta-learning applies to multi-task distributions; not applicable here.</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-card full-width">
+                        <h3>🎯 Environmental Fit Rationale</h3>
+                        <div class="decision-content">
+                            <table class="decision-table">
+                                <tr>
+                                    <th>Criterion</th>
+                                    <th>FrozenLake-v1</th>
+                                    <th>Why It's Perfect for This Capstone</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>State Space</strong></td>
+                                    <td>Discrete (16)</td>
+                                    <td>Enables exact tabular methods (DP, MC, TD); computable in seconds</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Action Space</strong></td>
+                                    <td>Discrete (4)</td>
+                                    <td>Perfect for DQN; no continuous rescaling; simple ε-greedy selection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Observability</strong></td>
+                                    <td>Fully Observable</td>
+                                    <td>No POMDP complexity; state == complete information</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Stochasticity</strong></td>
+                                    <td>Deterministic Option</td>
+                                    <td>Isolates algorithm behavior; eliminates environmental noise confounds</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Complexity</strong></td>
+                                    <td>Low</td>
+                                    <td>Allows focus on algorithm design vs. environment engineering</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Visualization</strong></td>
+                                    <td>Grid-based</td>
+                                    <td>Policy/value/saliency rasterization intuitive and interpretable</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Computation</strong></td>
+                                    <td>Fast</td>
+                                    <td>Full RL suite trains in minutes; enables rapid iteration</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 RL Course Capstone V3 | Developed with Claude Haiku 4.5 (Anthropic)</p>
+            <p>See <a href="../DECISIONS.md">DECISIONS.md</a> and <a href="../README.md">README.md</a> for full documentation.</p>
+        </div>
+    </footer>
+
+    <script src="assets/app.js"></script>
+</body>
+</html>
