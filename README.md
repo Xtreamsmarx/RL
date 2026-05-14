@@ -1,216 +1,144 @@
-# RL Course — V1
+# RL Course - V2
 
-Tabular reinforcement learning implementations applied to **FrozenLake-v1** (Gymnasium).
-
----
-
-## Repository Structure (cookiecutter data-science layout)
-
-```
-rl_course_v1/
-├── README.md
-├── requirements.txt          # pip dependencies
-├── environment.yml           # conda environment
-├── setup.py                  # editable install
-├── train.py                  # CLI entry point (train / evaluate)
-│
-├── models/
-│   └── best.pkl              # optimal policy kernel + V* (Policy Iteration, γ=0.99)
-│
-├── data/
-│   ├── raw/                  # (ignored by git)
-│   └── processed/            # (ignored by git)
-│
-├── reports/
-│   └── figures/              # generated plots (ignored by git)
-│
-├── notebooks/                # exploratory notebooks
-│
-└── src/rl_course_v1/
-    ├── mdp/
-    │   ├── base.py           # TabularMDP  (S, A, P, R, γ)
-    │   ├── policy.py         # Policy, DeterministicPolicy, ValueFunction, QValueFunction
-    │   └── subtasks.py       # Subtask definitions for FrozenLake
-    │
-    ├── algorithms/
-    │   ├── dp.py             # Policy Evaluation/Iteration, Value Iteration (V & Q)
-    │   ├── monte_carlo.py    # MC prediction + MC control (ES, ε-greedy)
-    │   ├── td.py             # TD(0), n-step TD, TD(λ)  [state-value based]
-    │   ├── sarsa.py          # Sarsa(0), n-step Sarsa, Sarsa(λ)
-    │   └── q_learning.py     # Q-learning (off-policy)
-    │
-    ├── agents/
-    │   └── agent.py          # TabularAgent + AgentConfig (train / eval / save / load)
-    │
-    └── exploration/
-        └── strategies.py     # ε-greedy (decaying), UCB1, Boltzmann, Count-bonus
-```
-
----
+Version 2 extends the repository from tabular RL into a mixed classical + deep RL codebase, while keeping reproducible structure for replay data, checkpoints, and diagnostics.
 
 ## Setup
 
 ```bash
-# Conda (recommended)
-conda env create -f environment.yml
-conda activate rl_course_v1
-
-# or pip
 pip install -e .
 ```
 
----
-
-## MDP Representation
-
-The environment is modelled as a finite MDP $(S, A, P, R, \gamma)$:
-
-| Component | Implementation | Description |
-|-----------|---------------|-------------|
-| **States** $S$ | `TabularMDP.n_states` | Discrete flat indices (16 for 4×4 FrozenLake) |
-| **Actions** $A$ | `TabularMDP.n_actions` | Left/Down/Right/Up (4) |
-| **Transitions** $P(s'\|s,a)$ | `TabularMDP.P_matrix` — shape `(S,A,S)` | Built from `env.unwrapped.P` |
-| **Rewards** $R(s,a)$ | `TabularMDP.R_matrix` — shape `(S,A)` | Expected reward $\sum_{s'} P(s'\|s,a)\,r$ |
-| **Discount** $\gamma$ | `TabularMDP.gamma` | Default 0.99 |
-| **Policy** $\pi(a\|s)$ | `Policy.probs` — shape `(S,A)` | Stochastic; deterministic as special case |
-| **Subtasks** | `Subtask` | Named state-space slices + sub-goals |
-
-The agent must eventually bootstrap its own $(P, R)$ estimates from experience —
-model-based RL / world-model learning — using the `TabularMDP` matrices as
-the ground truth to compare against.
-
----
-
-## Algorithms Implemented
-
-### Dynamic Programming (model-based, exact)
-
-| Function | File | Description |
-|----------|------|-------------|
-| `policy_evaluation` | `dp.py` | Iterative Bellman expectation → $V^\pi$ |
-| `q_policy_evaluation` | `dp.py` | Iterative Bellman expectation → $Q^\pi$ |
-| `policy_improvement_v` | `dp.py` | One-step greedy improvement on $V$ |
-| `policy_improvement_q` | `dp.py` | One-step greedy improvement on $Q$ |
-| `policy_iteration` | `dp.py` | PE + PI loop → $\pi^*$, $V^*$ |
-| `q_policy_iteration` | `dp.py` | Q-based PI loop → $\pi^*$, $Q^*$ |
-| `value_iteration` | `dp.py` | Bellman optimality operator → $V^*$ |
-
-### Monte Carlo (model-free, episodic)
-
-| Function | File | Description |
-|----------|------|-------------|
-| `mc_prediction_first_visit` | `monte_carlo.py` | First-visit MC → $V^\pi$ |
-| `mc_prediction_every_visit` | `monte_carlo.py` | Every-visit MC → $V^\pi$ |
-| `mc_control_epsilon_greedy` | `monte_carlo.py` | On-policy MC control → $\pi^*$ |
-| `mc_control_exploring_starts` | `monte_carlo.py` | MC-ES control → $\pi^*$ |
-
-### Temporal Difference (model-free, online)
-
-| Function | File | Description |
-|----------|------|-------------|
-| `td0_prediction` | `td.py` | TD(0) → $V^\pi$ |
-| `n_step_td_prediction` | `td.py` | Forward-view $n$-step TD → $V^\pi$ |
-| `td_lambda_prediction` | `td.py` | Backward-view TD(λ) via eligibility traces → $V^\pi$ |
-| `n_step_td_control` | `td.py` | Forward-view $n$-step TD + greedy → $\pi^*$ |
-| `td_lambda_control` | `td.py` | Backward-view TD(λ) + greedy → $\pi^*$ |
-| `sarsa_zero` | `sarsa.py` | One-step on-policy Sarsa → $Q^\pi$ |
-| `n_step_sarsa` | `sarsa.py` | Forward-view $n$-step Sarsa → $Q^*$ |
-| `sarsa_lambda` | `sarsa.py` | Backward-view Sarsa(λ) via eligibility traces → $Q^*$ |
-| `q_learning` | `q_learning.py` | Off-policy Q-learning → $Q^*$ |
-
-### Exploration
-
-| Class | Description |
-|-------|-------------|
-| `EpsilonGreedy` | ε-greedy with linear decay |
-| `UCB1` | Upper Confidence Bound (tabular) |
-| `BoltzmannExplorer` | Softmax / Boltzmann |
-| `CountBonus` | Intrinsic curiosity via $\beta/\sqrt{N(s,a)}$ |
-
----
-
-## Usage
+or
 
 ```bash
-# Policy Iteration (exact DP, best for FrozenLake):
-python train.py --algorithm policy_iteration --save
-
-# Q-learning:
-python train.py --algorithm q_learning --n_episodes 20000 --save
-
-# Sarsa(λ):
-python train.py --algorithm sarsa_lambda --lam 0.8 --alpha 0.05 --n_episodes 30000 --save
-
-# Evaluate saved policy:
-python train.py --eval_only --checkpoint models/best.pkl
+conda env create -f environment.yml
+conda activate rl_course_v1
+pip install -e .
 ```
 
-### Programmatic API
-
-```python
-import gymnasium as gym
-from rl_course_v1.agents import TabularAgent, AgentConfig
-
-env    = gym.make("FrozenLake-v1", is_slippery=True)
-config = AgentConfig(algorithm="q_learning", n_episodes=20_000, gamma=0.99)
-agent  = TabularAgent(config)
-agent.train(env)
-agent.evaluate(env, n_episodes=500)
-agent.save("models/my_agent.pkl")
-```
-
----
-
-## Best Policy (V1 Submission)
-
-Trained via **exact Policy Iteration** on the full MDP model (γ = 0.99, stochastic FrozenLake):
+## V2 Repository Additions
 
 ```
-Optimal policy (← Down → ↑):
-  <  ^  ^  ^
-  <  H  <  H
-  ^  v  <  H
-  H  >  v  H
+checkpoints/
+   dqn/
+      FrozenLake-v1/
+         default/                # online.pt, target.pt, config.json, metrics.json
 
-V* (4×4, rounded):
- 0.542  0.499  0.471  0.457
- 0.559  0.000  0.358  0.000
- 0.592  0.643  0.615  0.000
- 0.000  0.742  0.863  0.000
+data/
+   replay/
+      raw/
+         dqn/
+            FrozenLake-v1/
+               fresh/              # replay snapshots (step_*.npz, latest.npz)
+
+docs/
+   technical-challenges.md     # bugs, surprises, and implementation notes
+
+scripts/
+   rotate_replay.py            # replace old replay files with newer snapshots
+   saliency_dqn.py             # generate state-saliency plots from DQN checkpoint
+
+src/rl_course_v1/
+   deep/
+      dqn.py                    # DQN implementation
+   networks/
+      mlp.py                    # Q-network architectures
+   replay/
+      buffer.py                 # replay buffer with size assertions and .npz persistence
+   utils/
+      saliency.py               # gradient saliency tools
+      rasterize_q_values.py     # tabular policy/value raster utility
 ```
 
-Saved to `models/best.pkl` (cloudpickle).  Load with:
+## Classical RL Coverage
 
-```python
-from rl_course_v1.agents import TabularAgent
-agent = TabularAgent.load("models/best.pkl")
+Implemented algorithms include:
+
+1. Monte Carlo: first-visit prediction, every-visit prediction, epsilon-greedy control, exploring starts control.
+2. TD(n): forward-view prediction and forward-view control.
+3. TD(lambda):
+    1. forward-view prediction via lambda-returns
+    2. backward-view prediction with eligibility traces
+    3. backward-view control with eligibility traces
+4. SARSA(n): forward-view n-step SARSA.
+5. SARSA(lambda):
+    1. forward-view control via lambda-returns
+    2. backward-view control with eligibility traces
+6. Q-learning: one-step off-policy control.
+
+Backward-view lambda methods support practical n-cutoff style trace truncation through an optional trace_cutoff parameter.
+
+## Deep RL in V2
+
+Currently implemented deep RL algorithm:
+
+1. DQN for discrete-action environments (FrozenLake-v1 baseline).
+
+DQN features included:
+
+1. online and target networks with periodic sync.
+2. epsilon-greedy exploration schedule.
+3. replay buffer with hard capacity assertions.
+4. replay snapshot persistence for reproducibility.
+5. JSON config and metric logging per run.
+
+### Train DQN
+
+```bash
+python train_drl.py --algorithm dqn --env FrozenLake-v1 --episodes 1500 --checkpoint_dir checkpoints/dqn/FrozenLake-v1/default --replay_dir data/replay/raw/dqn/FrozenLake-v1/fresh
 ```
 
----
+## Replay Buffer Organization and Rotation
 
-## Citations & References
+Replay data is organized by algorithm, task, and freshness under:
 
-1. **Sutton, R. S., & Barto, A. G.** (2018). *Reinforcement Learning: An Introduction* (2nd ed.).
-   MIT Press. http://incompleteideas.net/book/the-book.html
-   — Primary textbook. All algorithms reference chapter numbers inline.
+data/replay/raw/<algorithm>/<task>/<freshness>
 
-2. **Watkins, C. J. C. H., & Dayan, P.** (1992). Q-learning.
-   *Machine Learning*, 8(3–4), 279–292.
-   https://doi.org/10.1007/BF00992698
+To replace older replay with newer snapshots while respecting storage limits:
 
-3. **Gymnasium** (formerly OpenAI Gym). Farama Foundation.
-   https://gymnasium.farama.org/
+```bash
+python scripts/rotate_replay.py --source_dir data/replay/raw/dqn/FrozenLake-v1/fresh --max_files 25 --max_total_mb 2048
+```
 
-4. **NumPy** (Harris et al., 2020). *Nature*, 585, 357–362.
-   https://doi.org/10.1038/s41586-020-2649-2
+## Saliency and Visualization Utilities
 
----
+1. Rasterization utility for tabular Q/policy visualization: src/rl_course_v1/utils/rasterize_q_values.py
+2. DQN saliency utility: src/rl_course_v1/utils/saliency.py
+3. Script to generate saliency figures from a checkpoint:
 
-## Collaborations
+```bash
+python scripts/saliency_dqn.py --checkpoint checkpoints/dqn/FrozenLake-v1/default/online.pt --state 0 --out reports/figures/dqn_saliency_state0.png
+```
 
-*(List any collaborators or external resources used here per syllabus requirements.)*
+## Justification for Deep RL Choice (DQN)
 
----
+Environment fit is the main reason for prioritizing DQN in V2.
+
+1. FrozenLake is discrete in state and action spaces. DQN naturally supports discrete action value learning, making it the most direct deep extension from tabular Q-learning.
+2. REINFORCE and vanilla actor-critic are valid, but both introduce higher policy-gradient variance without clear advantage for this low-dimensional benchmark.
+3. PPO and TRPO are robust policy-gradient families, but they are heavier optimization stacks than needed for the current environment scale.
+4. DDPG, TD3, and SAC are designed primarily for continuous action control, so they are comparatively mismatched to FrozenLake.
+5. DQN keeps implementation complexity moderate while still adding core deep RL engineering requirements: replay buffer, target network, checkpoint tracking, and training logs.
+
+This makes DQN the strongest first DRL choice for this environment, while leaving room to add actor-critic style methods in future versions.
+
+## Difficulties and Surprises
+
+Technical obstacles and surprises are tracked in docs/technical-challenges.md.
+
+## Core Commands
+
+Classical training:
+
+```bash
+python train.py --algorithm q_learning --n_episodes 20000 --save --checkpoint models/best_full.pkl
+```
+
+Classical evaluation:
+
+```bash
+python train.py --eval_only --checkpoint models/best_full.pkl
+```
 
 ## License
 

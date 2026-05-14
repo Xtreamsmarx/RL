@@ -61,3 +61,7 @@ logs/
 # Reports / figures (keep structure)
 reports/figures/*
 !reports/figures/.gitkeep
+
+# Replay snapshots (keep structure)
+data/replay/**
+!data/replay/**/.gitkeep

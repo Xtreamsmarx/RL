@@ -1,0 +1,8 @@
+{
+  "mean_return": 0.0,
+  "std_return": 0.0,
+  "mean_loss": 0.0,
+  "episodes": 5,
+  "steps": 30,
+  "device": "cpu"
+}

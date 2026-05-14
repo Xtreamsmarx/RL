@@ -41,6 +41,7 @@ class AgentConfig:
 
     # TD(λ) / Sarsa(λ)
     lam:              float = 0.9
+    trace_cutoff: Optional[int] = None
     replacing_traces: bool  = True
 
     # Checkpoint
@@ -55,7 +56,8 @@ def _build_registry() -> dict[str, Callable]:
         policy_iteration, q_policy_iteration, value_iteration,
         mc_control_epsilon_greedy, mc_control_exploring_starts,
         td0_prediction, n_step_td_control, td_lambda_control,
-        sarsa_zero, n_step_sarsa, sarsa_lambda,
+        td_lambda_prediction_forward,
+        sarsa_zero, n_step_sarsa, sarsa_lambda, sarsa_lambda_forward,
         q_learning,
     )
     return {
@@ -65,10 +67,12 @@ def _build_registry() -> dict[str, Callable]:
         "mc_epsilon_greedy":       mc_control_epsilon_greedy,
         "mc_exploring_starts":     mc_control_exploring_starts,
         "td0":                     td0_prediction,
+        "td_lambda_forward":       td_lambda_prediction_forward,
         "n_step_td":               n_step_td_control,
         "td_lambda":               td_lambda_control,
         "sarsa":                   sarsa_zero,
         "n_step_sarsa":            n_step_sarsa,
+        "sarsa_lambda_forward":    sarsa_lambda_forward,
         "sarsa_lambda":            sarsa_lambda,
         "q_learning":              q_learning,
     }
@@ -131,11 +135,20 @@ class TabularAgent:
         elif alg in ("td0",):
             from rl_course_v1.mdp.policy import Policy
             pi  = Policy.uniform(env.observation_space.n, env.action_space.n)
-            result = (fn(env, pi,
-                         n_episodes=cfg.n_episodes,
-                         alpha=cfg.alpha,
-                         gamma=cfg.gamma,
-                         rng=self._rng),)
+            result = fn(env, pi,
+                        n_episodes=cfg.n_episodes,
+                        alpha=cfg.alpha,
+                        gamma=cfg.gamma,
+                        rng=self._rng)
+        elif alg in ("td_lambda_forward",):
+            from rl_course_v1.mdp.policy import Policy
+            pi = Policy.uniform(env.observation_space.n, env.action_space.n)
+            result = fn(env, pi,
+                        lam=cfg.lam,
+                        n_episodes=cfg.n_episodes,
+                        alpha=cfg.alpha,
+                        gamma=cfg.gamma,
+                        rng=self._rng)
         elif alg in ("n_step_td",):
             result = fn(env,
                         n=cfg.n_steps,
@@ -151,6 +164,7 @@ class TabularAgent:
                         alpha=cfg.alpha,
                         gamma=cfg.gamma,
                         epsilon=cfg.epsilon,
+                        trace_cutoff=cfg.trace_cutoff,
                         rng=self._rng)
         elif alg in ("sarsa",):
             result = fn(env,
@@ -167,6 +181,14 @@ class TabularAgent:
                         gamma=cfg.gamma,
                         epsilon=cfg.epsilon,
                         rng=self._rng)
+        elif alg in ("sarsa_lambda_forward",):
+            result = fn(env,
+                        lam=cfg.lam,
+                        n_episodes=cfg.n_episodes,
+                        alpha=cfg.alpha,
+                        gamma=cfg.gamma,
+                        epsilon=cfg.epsilon,
+                        rng=self._rng)
         elif alg in ("sarsa_lambda",):
             result = fn(env,
                         lam=cfg.lam,
@@ -174,6 +196,7 @@ class TabularAgent:
                         alpha=cfg.alpha,
                         gamma=cfg.gamma,
                         epsilon=cfg.epsilon,
+                        trace_cutoff=cfg.trace_cutoff,
                         replacing_traces=cfg.replacing_traces,
                         rng=self._rng)
         elif alg in ("mc_epsilon_greedy",):
@@ -206,7 +229,11 @@ class TabularAgent:
                 elif isinstance(vq, QValueFunction):
                     self.Q = vq
             else:
-                self.policy = result[0]
+                candidate = result[0]
+                if isinstance(candidate, ValueFunction):
+                    self.V = candidate
+                else:
+                    self.policy = candidate
         else:
             # Prediction-only path returns a value function
             self.V = result

@@ -40,8 +40,8 @@ def build_parser() -> argparse.ArgumentParser:
         choices=[
             "policy_iteration", "q_policy_iteration", "value_iteration",
             "mc_epsilon_greedy", "mc_exploring_starts",
-            "td0", "n_step_td", "td_lambda",
-            "sarsa", "n_step_sarsa", "sarsa_lambda",
+            "td0", "td_lambda_forward", "n_step_td", "td_lambda",
+            "sarsa", "n_step_sarsa", "sarsa_lambda_forward", "sarsa_lambda",
             "q_learning",
         ],
         help="RL algorithm to use.",
@@ -64,6 +64,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="n for n-step methods.")
     p.add_argument("--lam",        type=float, default=0.9,
                    help="λ for TD(λ)/Sarsa(λ).")
+    p.add_argument("--trace_cutoff", type=int, default=None,
+                   help="Optional practical n-cutoff for backward-view traces.")
     p.add_argument("--seed",       type=int,   default=42)
 
     # Eval
@@ -103,6 +105,7 @@ def main():
             n_episodes   = args.n_episodes,
             n_steps      = args.n_steps,
             lam          = args.lam,
+            trace_cutoff = args.trace_cutoff,
             seed         = args.seed,
             checkpoint_dir = "models",
         )
@@ -112,7 +115,10 @@ def main():
         if args.save:
             agent.save(args.checkpoint)
 
-    agent.evaluate(env, n_episodes=args.eval_episodes)
+    if agent.policy is not None:
+        agent.evaluate(env, n_episodes=args.eval_episodes)
+    else:
+        print("[train.py] This algorithm produced a value function only (no policy to evaluate).")
     env.close()
 
 

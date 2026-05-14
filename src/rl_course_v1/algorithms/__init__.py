@@ -10,9 +10,15 @@ from rl_course_v1.algorithms.monte_carlo import (
 )
 from rl_course_v1.algorithms.td          import (
     td0_prediction, n_step_td_prediction, td_lambda_prediction,
+    td_lambda_prediction_forward,
     n_step_td_control, td_lambda_control,
 )
-from rl_course_v1.algorithms.sarsa       import sarsa_zero, n_step_sarsa, sarsa_lambda
+from rl_course_v1.algorithms.sarsa       import (
+    sarsa_zero,
+    n_step_sarsa,
+    sarsa_lambda,
+    sarsa_lambda_forward,
+)
 from rl_course_v1.algorithms.q_learning  import q_learning
 
 __all__ = [
@@ -25,9 +31,10 @@ __all__ = [
     "mc_control_epsilon_greedy", "mc_control_exploring_starts",
     # TD
     "td0_prediction", "n_step_td_prediction", "td_lambda_prediction",
+    "td_lambda_prediction_forward",
     "n_step_td_control", "td_lambda_control",
     # Sarsa
-    "sarsa_zero", "n_step_sarsa", "sarsa_lambda",
+    "sarsa_zero", "n_step_sarsa", "sarsa_lambda", "sarsa_lambda_forward",
     # Q-learning
     "q_learning",
 ]

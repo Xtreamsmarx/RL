@@ -15,5 +15,6 @@ setup(
         "pandas>=2.2.0",
         "tqdm>=4.66.0",
         "cloudpickle>=3.0.0",
+        "torch>=2.2.0",
     ],
 )

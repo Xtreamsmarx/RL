@@ -4,6 +4,7 @@ Sarsa algorithms — on-policy TD control operating on Q-values.
 Implements:
   - sarsa_zero          : one-step Sarsa → Q^π
   - n_step_sarsa        : forward-view Sarsa(n) → Q*
+    - sarsa_lambda_forward: forward-view Sarsa(λ) → Q*
   - sarsa_lambda        : backward-view Sarsa(λ) via eligibility traces → Q*
 
 All methods use ε-greedy exploration and improve Q(s,a) directly.
@@ -18,6 +19,36 @@ import numpy as np
 from typing import Optional
 
 from rl_course_v1.mdp.policy import Policy, QValueFunction
+
+
+def _lambda_return_q_from_t(
+    rewards: list[float],
+    states: list[int],
+    actions: list[int],
+    Q: QValueFunction,
+    t: int,
+    T: int,
+    lam: float,
+    gamma: float,
+) -> float:
+    """Compute forward-view Sarsa(lambda) return for one (s_t, a_t)."""
+    g_lambda = 0.0
+    weight = 1.0
+    horizon = T - t
+
+    for n in range(1, horizon):
+        g_n = 0.0
+        for k in range(1, n + 1):
+            g_n += (gamma ** (k - 1)) * rewards[t + k]
+        g_n += (gamma ** n) * Q[states[t + n], actions[t + n]]
+        g_lambda += (1.0 - lam) * weight * g_n
+        weight *= lam
+
+    g_mc = 0.0
+    for k in range(1, horizon + 1):
+        g_mc += (gamma ** (k - 1)) * rewards[t + k]
+    g_lambda += weight * g_mc
+    return g_lambda
 
 
 # ---------------------------------------------------------------------------
@@ -140,6 +171,7 @@ def sarsa_lambda(
     alpha: float    = 0.1,
     gamma: float    = 0.99,
     epsilon: float  = 0.1,
+    trace_cutoff: Optional[int] = None,
     replacing_traces: bool = True,
     rng: Optional[np.random.Generator] = None,
 ) -> tuple[Policy, QValueFunction]:
@@ -156,6 +188,9 @@ def sarsa_lambda(
     replacing_traces : bool
         True  → replacing traces (clips eligibility at 1, reduces variance).
         False → accumulating traces (standard).
+    trace_cutoff : Optional[int]
+        Optional practical n-cutoff variant. If set, traces with tiny
+        weights below (gamma * lam)^trace_cutoff are truncated to zero.
     """
     rng = rng or np.random.default_rng()
     n_s = env.observation_space.n
@@ -185,10 +220,68 @@ def sarsa_lambda(
             else:
                 e[int(s), a] += 1.0
 
+            if trace_cutoff is not None:
+                threshold = (gamma * lam) ** max(int(trace_cutoff), 1)
+                e[e < threshold] = 0.0
+
             Q.values += alpha * delta * e
             e        *= gamma * lam
 
             s, a = s_next, a_next
+
+    pi = Policy.epsilon_greedy_from_q(Q, epsilon)
+    return pi, Q
+
+
+def sarsa_lambda_forward(
+    env,
+    lam: float      = 0.9,
+    n_episodes: int = 10_000,
+    alpha: float    = 0.1,
+    gamma: float    = 0.99,
+    epsilon: float  = 0.1,
+    rng: Optional[np.random.Generator] = None,
+) -> tuple[Policy, QValueFunction]:
+    """Forward-view Sarsa(lambda) control using lambda-returns."""
+    rng = rng or np.random.default_rng()
+    n_s = env.observation_space.n
+    n_a = env.action_space.n
+    Q = QValueFunction(n_s, n_a, init=0.0)
+
+    def eps_greedy(s: int) -> int:
+        if rng.random() < epsilon:
+            return int(rng.integers(n_a))
+        return int(np.argmax(Q[s]))
+
+    for _ in range(n_episodes):
+        s, _ = env.reset()
+        states = [int(s)]
+        actions = [eps_greedy(int(s))]
+        rewards = [0.0]
+
+        done = False
+        while not done:
+            s_next, r, terminated, truncated, _ = env.step(actions[-1])
+            rewards.append(float(r))
+            states.append(int(s_next))
+            done = terminated or truncated
+            if not done:
+                actions.append(eps_greedy(int(s_next)))
+
+        T = len(states) - 1
+        for t in range(T):
+            g_lam = _lambda_return_q_from_t(
+                rewards=rewards,
+                states=states,
+                actions=actions,
+                Q=Q,
+                t=t,
+                T=T,
+                lam=lam,
+                gamma=gamma,
+            )
+            s_t, a_t = states[t], actions[t]
+            Q[s_t, a_t] += alpha * (g_lam - Q[s_t, a_t])
 
     pi = Policy.epsilon_greedy_from_q(Q, epsilon)
     return pi, Q

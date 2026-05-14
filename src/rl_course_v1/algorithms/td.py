@@ -4,6 +4,7 @@ Temporal Difference learning algorithms.
 Implements:
   - td0_prediction           : TD(0) policy evaluation → V^π
   - n_step_td_prediction     : forward-view TD(n) → V^π
+    - td_lambda_prediction_forward : forward-view TD(λ) → V^π
   - td_lambda_prediction     : backward-view TD(λ) via eligibility traces → V^π
   - n_step_td_control        : forward-view TD(n) + greedy improvement → π*
   - td_lambda_control        : backward-view TD(λ) + greedy improvement → π*
@@ -21,6 +22,35 @@ import numpy as np
 from typing import Optional
 
 from rl_course_v1.mdp.policy import Policy, ValueFunction
+
+
+def _lambda_return_from_t(
+    rewards: list[float],
+    states: list[int],
+    V: ValueFunction,
+    t: int,
+    T: int,
+    lam: float,
+    gamma: float,
+) -> float:
+    """Compute the forward-view lambda-return for one timestep t."""
+    g_lambda = 0.0
+    weight = 1.0
+    horizon = T - t
+
+    for n in range(1, horizon):
+        g_n = 0.0
+        for k in range(1, n + 1):
+            g_n += (gamma ** (k - 1)) * rewards[t + k]
+        g_n += (gamma ** n) * V[states[t + n]]
+        g_lambda += (1.0 - lam) * weight * g_n
+        weight *= lam
+
+    g_mc = 0.0
+    for k in range(1, horizon + 1):
+        g_mc += (gamma ** (k - 1)) * rewards[t + k]
+    g_lambda += weight * g_mc
+    return g_lambda
 
 
 # ---------------------------------------------------------------------------
@@ -124,6 +154,7 @@ def td_lambda_prediction(
     n_episodes: int = 5_000,
     alpha: float    = 0.1,
     gamma: float    = 0.99,
+    trace_cutoff: Optional[int] = None,
     rng: Optional[np.random.Generator] = None,
 ) -> ValueFunction:
     """
@@ -132,6 +163,12 @@ def td_lambda_prediction(
     δ_t = R_{t+1} + γ V(S_{t+1}) - V(S_t)
     e_t(s) = γλ e_{t-1}(s) + 1[S_t = s]
     V(s) ← V(s) + α δ_t e_t(s)  ∀s
+
+    Parameters
+    ----------
+    trace_cutoff : Optional[int]
+        Optional practical n-cutoff variant. If set, traces with tiny
+        weights below (gamma * lam)^trace_cutoff are truncated to zero.
     """
     rng  = rng or np.random.default_rng()
     n_s  = env.observation_space.n
@@ -149,8 +186,56 @@ def td_lambda_prediction(
             delta  = r + gamma * (0.0 if done else V[int(s_next)]) - V[int(s)]
             e     *= gamma * lam
             e[int(s)] += 1.0            # accumulating trace
+            if trace_cutoff is not None:
+                threshold = (gamma * lam) ** max(int(trace_cutoff), 1)
+                e[e < threshold] = 0.0
             V.values  += alpha * delta * e
             s          = s_next
+
+    return V
+
+
+def td_lambda_prediction_forward(
+    env,
+    pi: Policy,
+    lam: float      = 0.9,
+    n_episodes: int = 5_000,
+    alpha: float    = 0.1,
+    gamma: float    = 0.99,
+    rng: Optional[np.random.Generator] = None,
+) -> ValueFunction:
+    """Forward-view TD(lambda) policy evaluation via lambda-returns."""
+    rng = rng or np.random.default_rng()
+    n_s = env.observation_space.n
+    V = ValueFunction(n_s)
+
+    for _ in range(n_episodes):
+        states: list[int] = []
+        rewards: list[float] = [0.0]
+        s, _ = env.reset()
+        states.append(int(s))
+
+        done = False
+        while not done:
+            a = pi.act(states[-1], rng)
+            s_next, r, terminated, truncated, _ = env.step(a)
+            rewards.append(float(r))
+            states.append(int(s_next))
+            done = terminated or truncated
+
+        T = len(states) - 1
+        for t in range(T):
+            g_lam = _lambda_return_from_t(
+                rewards=rewards,
+                states=states,
+                V=V,
+                t=t,
+                T=T,
+                lam=lam,
+                gamma=gamma,
+            )
+            s_t = states[t]
+            V[s_t] += alpha * (g_lam - V[s_t])
 
     return V
 
